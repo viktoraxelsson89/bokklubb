@@ -14,21 +14,21 @@
 ---
 
 ## Fas 1: Store + första page (mål: 4-6h)
-### Slutförda steg:
+### Slutförda:
 - [x] Git-setup och initial commit
-- [x] Skapat REFACTOR_STATUS.md
+- [x] Skapat mappstruktur
+- [x] Skapat js/state/store.js (med batching, safe unsubscribe)
+- [x] Skapat js/utils/metrics.js (getAvgRating, calculateCorrelation, getRatingColor)
+- [x] Skapat js/state/selectors.js (getFinalizedBooks, getCurrentBook, getSeasonWinner, etc)
 
 ### Pågående:
-- [ ] Skapa js/state/store.js
-- [ ] Skapa js/utils/metrics.js
-- [ ] Skapa js/state/selectors.js
-- [ ] Flytta Firebase snapshot-logik till js/data/books.js
-- [ ] Konvertera bookshelf.js till store-baserad rendering
+- [ ] Extrahera bookshelf-logik från index.html till js/pages/bookshelf.js
+- [ ] Koppla bookshelf.js till store
 
 ### Tekniska noteringar:
-(Kommer fyllas på under arbetet)
-
----
+- Store använder batched notify för att förhindra render-stormar
+- Metrics är rena funktioner utan side effects
+- Selectors importerar från metrics för att undvika duplicerad logik
 
 ## Fas 2: Covers + modals (mål: 2-3h)
 Status: Ej påbörjad
