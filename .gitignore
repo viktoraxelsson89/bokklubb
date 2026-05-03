@@ -81,3 +81,13 @@ desktop.ini
 
 # Build artifacts (lägg till dessa)
 dist/
+.vite/
+
+# Claude Code (lokala inställningar och cache)
+.claude/
+
+# Designmaterial och tempfiler (ej en del av appen)
+design_bundle/
+design_extracted.html
+C*tempbokklubb_original.html
+.handoff_tmp/

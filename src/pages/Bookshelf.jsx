@@ -1,0 +1,195 @@
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext.jsx'
+import { useBooks } from '../context/BooksContext.jsx'
+import { getAllSeasons, getBooksBySeason } from '../domain/books.js'
+import { getDisplayAverage } from '../domain/calculations.js'
+import { DS, LORA } from '../styles/tokens.js'
+import {
+  BookRow,
+  CoverPlaceholder,
+  MutedLabel,
+  PhasePill,
+  RatingBadge,
+  SortChips,
+  VoteDots,
+} from '../components/ui.jsx'
+
+export { RatingBadge }
+
+const SORT_OPTIONS = [
+  { value: 'season', label: 'Säsong' },
+  { value: 'title',  label: 'Titel'  },
+  { value: 'rating', label: 'Betyg'  },
+  { value: 'recent', label: 'Senast läst' },
+]
+
+function sortFinalized(books, sortBy) {
+  const sorted = [...books]
+  if (sortBy === 'title')  return sorted.sort((a, b) => a.title.localeCompare(b.title, 'sv'))
+  if (sortBy === 'rating') return sorted.sort((a, b) => getDisplayAverage(b) - getDisplayAverage(a))
+  if (sortBy === 'recent') return sorted.sort((a, b) => {
+    const da = a.meetingDate || a.finalizedAt || ''
+    const db = b.meetingDate || b.finalizedAt || ''
+    return db.localeCompare(da)
+  })
+  return sorted
+}
+
+export default function Bookshelf() {
+  const { userData, logout } = useAuth()
+  const { books, currentBook, loading } = useBooks()
+  const navigate = useNavigate()
+  const [sortBy, setSortBy] = useState('season')
+
+  if (loading) {
+    return (
+      <div style={{ minHeight: '100vh', background: DS.gradientBg, padding: 24, color: DS.soft }}>
+        Laddar böcker…
+      </div>
+    )
+  }
+
+  const finalizedBooks = books.filter(b => b.phase === 'finalized')
+  const seasons = getAllSeasons(finalizedBooks)
+  const finalsSubmitted = currentBook
+    ? Object.values(currentBook.finalJudgments || {}).filter(v => v?.submitted).length
+    : 0
+
+  return (
+    <div style={{ minHeight: '100vh', background: DS.gradientBg, color: DS.ink }}>
+      <div style={{ maxWidth: 760, margin: '0 auto', display: 'flex', flexDirection: 'column' }}>
+
+        {/* Header */}
+        <div style={{ padding: '18px 18px 14px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontFamily: LORA, fontWeight: 600, fontSize: '1.05rem', color: DS.ink, marginBottom: 2 }}>
+              Bokhyllan
+            </div>
+            <div style={{ fontSize: '0.72rem', color: DS.ash }}>
+              {finalizedBooks.length} böcker
+              {userData?.displayName && <span> · {userData.displayName}</span>}
+            </div>
+          </div>
+          <button
+            onClick={logout}
+            style={{
+              fontSize: '0.72rem',
+              fontFamily: 'inherit',
+              padding: 0,
+              border: 'none',
+              background: 'none',
+              color: DS.ash,
+              cursor: 'pointer',
+              textDecoration: 'underline',
+              flexShrink: 0,
+            }}
+          >Logga ut</button>
+        </div>
+
+        {/* Scrollable area */}
+        <div style={{ padding: '0 14px 24px' }}>
+
+          {/* Current book */}
+          {currentBook && (
+            <div style={{ marginBottom: 20 }}>
+              <MutedLabel>Pågående</MutedLabel>
+              <div
+                onClick={() => navigate(`/books/${currentBook.id}`)}
+                style={{
+                  marginTop: 8,
+                  background: 'rgba(201,192,148,0.28)',
+                  borderRadius: 24,
+                  padding: 16,
+                  display: 'flex',
+                  gap: 14,
+                  cursor: 'pointer',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  boxShadow: '0 4px 16px rgba(201,192,148,0.18)',
+                  outline: '1.5px solid rgba(201,192,148,0.5)',
+                  transition: 'transform 0.15s ease',
+                }}
+                onMouseDown={e => { e.currentTarget.style.transform = 'scale(0.99)' }}
+                onMouseUp={e => { e.currentTarget.style.transform = 'none' }}
+                onMouseLeave={e => { e.currentTarget.style.transform = 'none' }}
+              >
+                <div style={{
+                  position: 'absolute', inset: 0, pointerEvents: 'none',
+                  background: 'radial-gradient(100% 100% at 0% 0%, rgba(255,255,255,0.55) 0%, transparent 60%)',
+                }} />
+                <CoverPlaceholder title={currentBook.title} coverUrl={currentBook.coverUrl} size="md" />
+                <div style={{ flex: 1, minWidth: 0, position: 'relative' }}>
+                  <div style={{ marginBottom: 8 }}>
+                    <PhasePill phase={currentBook.phase} />
+                  </div>
+                  <div style={{
+                    fontFamily: LORA, fontWeight: 600, fontSize: '1rem', color: DS.ink,
+                    lineHeight: 1.3, marginBottom: 3,
+                  }}>
+                    {currentBook.title}
+                  </div>
+                  <div style={{ fontFamily: LORA, fontStyle: 'italic', fontSize: '0.78rem', color: DS.soft, marginBottom: 12 }}>
+                    {currentBook.author}
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <VoteDots votes={currentBook.finalJudgments} />
+                    <span style={{ fontSize: '0.7rem', color: DS.ash }}>
+                      {finalsSubmitted}/5 omdömen
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Sort header */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, gap: 8, flexWrap: 'wrap' }}>
+            <MutedLabel>Lästa böcker</MutedLabel>
+            <SortChips options={SORT_OPTIONS} value={sortBy} onChange={setSortBy} />
+          </div>
+
+          {sortBy === 'season' ? (
+            seasons.map(season => {
+              const seasonBooks = getBooksBySeason(finalizedBooks, season)
+              if (seasonBooks.length === 0) return null
+              return (
+                <section key={season} style={{ marginBottom: 22 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                    <span style={{ fontSize: '0.82rem', fontWeight: 600, color: DS.soft }}>
+                      Säsong {season}
+                    </span>
+                    <div style={{ flex: 1, height: 1, background: 'rgba(156,153,143,0.2)' }} />
+                    <span style={{ fontSize: '0.7rem', color: DS.ash }}>{seasonBooks.length} böcker</span>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    {seasonBooks.map(book => (
+                      <BookRow
+                        key={book.id}
+                        book={book}
+                        rating={getDisplayAverage(book)}
+                        onClick={() => navigate(`/books/${book.id}`)}
+                      />
+                    ))}
+                  </div>
+                </section>
+              )
+            })
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {sortFinalized(finalizedBooks, sortBy).map(book => (
+                <BookRow
+                  key={book.id}
+                  book={book}
+                  rating={getDisplayAverage(book)}
+                  showSeason
+                  onClick={() => navigate(`/books/${book.id}`)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
