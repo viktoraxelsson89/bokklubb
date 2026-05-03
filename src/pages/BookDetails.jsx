@@ -281,7 +281,10 @@ function DiscussionSection({ book, userData }) {
 }
 
 function FinalizedSection({ book }) {
+  const { userData } = useAuth()
+  const navigate = useNavigate()
   const avg = getDisplayAverage(book)
+  const showNextBookCta = book.isCurrentBook && userData?.role === 'admin'
 
   return (
     <>
@@ -300,6 +303,27 @@ function FinalizedSection({ book }) {
       <Section title="Slutomdömen">
         <VoteRowList votes={book.finalJudgments ?? {}} showAll />
       </Section>
+
+      {showNextBookCta && (
+        <div style={{
+          marginBottom: 18,
+          padding: 16,
+          background: 'rgba(186,209,150,0.18)',
+          border: '1px solid rgba(186,209,150,0.4)',
+          borderRadius: 16,
+          display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap',
+        }}>
+          <div style={{ flex: 1, minWidth: 180 }}>
+            <div style={{ fontFamily: LORA, fontWeight: 600, fontSize: '0.95rem', color: DS.ink, marginBottom: 2 }}>
+              Klart för nästa bok
+            </div>
+            <div style={{ fontSize: '0.78rem', color: DS.soft }}>
+              Den här boken är slutbetygsatt. Lägg till nästa aktuella bok.
+            </div>
+          </div>
+          <PrimaryBtn onClick={() => navigate('/books/new')}>+ Lägg till nästa bok</PrimaryBtn>
+        </div>
+      )}
 
       {Object.keys(book.preliminaryVotes ?? {}).length > 0 && (
         <CollapsiblePrelim book={book} />

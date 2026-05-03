@@ -90,6 +90,45 @@ export default function Bookshelf() {
         {/* Scrollable area */}
         <div style={{ padding: '0 14px 24px' }}>
 
+          {/* No current book — admin CTA */}
+          {!currentBook && userData?.role === 'admin' && (
+            <div style={{ marginBottom: 20 }}>
+              <MutedLabel>Pågående</MutedLabel>
+              <div
+                onClick={() => navigate('/books/new')}
+                style={{
+                  marginTop: 8,
+                  background: 'rgba(186,209,150,0.18)',
+                  borderRadius: 24,
+                  padding: 18,
+                  display: 'flex', alignItems: 'center', gap: 14,
+                  cursor: 'pointer',
+                  outline: '1.5px dashed rgba(186,209,150,0.55)',
+                  transition: 'transform 0.15s ease',
+                }}
+                onMouseDown={e => { e.currentTarget.style.transform = 'scale(0.99)' }}
+                onMouseUp={e => { e.currentTarget.style.transform = 'none' }}
+                onMouseLeave={e => { e.currentTarget.style.transform = 'none' }}
+              >
+                <div style={{
+                  width: 52, height: 52, borderRadius: 14,
+                  background: 'rgba(186,209,150,0.3)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '1.6rem', color: DS.ink, fontWeight: 300,
+                  flexShrink: 0,
+                }}>+</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontFamily: LORA, fontWeight: 600, fontSize: '1rem', color: DS.ink, marginBottom: 2 }}>
+                    Lägg till aktuell bok
+                  </div>
+                  <div style={{ fontSize: '0.78rem', color: DS.soft }}>
+                    Ingen pågående bok just nu.
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Current book */}
           {currentBook && (
             <div style={{ marginBottom: 20 }}>

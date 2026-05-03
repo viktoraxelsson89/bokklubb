@@ -5,6 +5,7 @@ import Login from './pages/Login.jsx'
 import Bookshelf from './pages/Bookshelf.jsx'
 import BookDetails from './pages/BookDetails.jsx'
 import BookEdit from './pages/BookEdit.jsx'
+import BookAdd from './pages/BookAdd.jsx'
 import Seasons from './pages/Seasons.jsx'
 import Members from './pages/Members.jsx'
 import Statistics from './pages/Statistics.jsx'
@@ -22,6 +23,7 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route element={<AuthenticatedLayout />}>
             <Route path="/" element={<Bookshelf />} />
+            <Route path="/books/new" element={<BookAdd />} />
             <Route path="/books/:bookId" element={<BookDetails />} />
             <Route path="/books/:bookId/edit" element={<BookEdit />} />
             <Route path="/seasons" element={<Seasons />} />
