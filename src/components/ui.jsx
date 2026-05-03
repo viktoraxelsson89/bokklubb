@@ -91,7 +91,7 @@ export function MutedLabel({ children }) {
   )
 }
 
-const COVER_DIMS = { xs: [32, 48], sm: [44, 66], md: [58, 87], lg: [78, 117] }
+const COVER_DIMS = { xs: [32, 48], sm: [44, 66], md: [58, 87], lg: [78, 117], xl: [180, 270] }
 const COVER_HUES = [30, 80, 130, 190, 230, 280, 320]
 
 export function CoverPlaceholder({ title, coverUrl, size = 'md' }) {
