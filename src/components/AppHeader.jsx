@@ -30,20 +30,21 @@ export default function AppHeader() {
       position: 'sticky',
       top: 0,
       zIndex: 50,
-      background: DS.bone,
-      borderBottom: '1px solid rgba(156,153,143,0.15)',
-      padding: '6px 18px 8px',
+      background: DS.dune,
+      borderBottom: '1px solid rgba(156,153,143,0.25)',
+      padding: 'calc(env(safe-area-inset-top) + 10px) 18px 10px',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
       gap: 12,
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 9, minWidth: 0 }}>
         <HashIcon />
         <span style={{
           fontFamily: LORA,
           fontWeight: 600,
-          fontSize: '0.9rem',
+          fontSize: '1.05rem',
+          letterSpacing: '0.01em',
           color: DS.ink,
           whiteSpace: 'nowrap',
           overflow: 'hidden',
@@ -51,7 +52,7 @@ export default function AppHeader() {
         }}>{CLUB_NAME}</span>
       </div>
       <div style={{
-        fontSize: '0.68rem',
+        fontSize: '0.72rem',
         color: DS.ash,
         textAlign: 'right',
         lineHeight: 1.4,
@@ -67,7 +68,7 @@ export default function AppHeader() {
 
 function HashIcon() {
   return (
-    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+    <svg width="24" height="24" viewBox="0 0 22 22" fill="none" aria-hidden="true">
       <line x1="7.5" y1="4" x2="5.5" y2="18" stroke={DS.sage} strokeWidth="2.2" strokeLinecap="round" />
       <line x1="14"  y1="4" x2="12"  y2="18" stroke={DS.sage} strokeWidth="2.2" strokeLinecap="round" />
       <line x1="4" y1="8.5"  x2="18" y2="8.5"  stroke={DS.sage} strokeWidth="2" strokeLinecap="round" />
