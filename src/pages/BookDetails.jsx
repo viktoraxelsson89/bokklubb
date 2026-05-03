@@ -19,6 +19,14 @@ import {
 
 const SLIDE_UP_KEYFRAMES = `@keyframes bookDetailSlideUp { from { transform: translateY(28px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }`
 
+const heroIconBtn = {
+  background: 'rgba(244,243,241,0.1)',
+  border: 'none', cursor: 'pointer',
+  borderRadius: 10, width: 30, height: 30,
+  display: 'flex', alignItems: 'center', justifyContent: 'center',
+  transition: 'background 0.15s',
+}
+
 export default function BookDetails() {
   const { bookId } = useParams()
   const { userData } = useAuth()
@@ -67,24 +75,32 @@ export default function BookDetails() {
             background: 'radial-gradient(80% 80% at 5% 0%, rgba(186,209,150,0.07) 0%, transparent 60%)',
           }} />
 
-          <button
-            onClick={() => navigate('/')}
-            style={{
-              background: 'rgba(244,243,241,0.1)',
-              border: 'none', cursor: 'pointer',
-              borderRadius: 10, width: 30, height: 30,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              marginBottom: 14,
-              transition: 'background 0.15s',
-              position: 'relative',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(244,243,241,0.18)' }}
-            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(244,243,241,0.1)' }}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(244,243,241,0.7)" strokeWidth="2.5" strokeLinecap="round">
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14, position: 'relative' }}>
+            <button
+              onClick={() => navigate('/')}
+              style={heroIconBtn}
+              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(244,243,241,0.18)' }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(244,243,241,0.1)' }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(244,243,241,0.7)" strokeWidth="2.5" strokeLinecap="round">
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </button>
+            {userData?.role === 'admin' && (
+              <button
+                onClick={() => navigate(`/books/${book.id}/edit`)}
+                style={heroIconBtn}
+                title="Redigera"
+                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(244,243,241,0.18)' }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'rgba(244,243,241,0.1)' }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(244,243,241,0.7)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 20h9" />
+                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
+                </svg>
+              </button>
+            )}
+          </div>
 
           <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start', position: 'relative' }}>
             <CoverPlaceholder title={book.title} coverUrl={book.coverUrl} size="lg" />
