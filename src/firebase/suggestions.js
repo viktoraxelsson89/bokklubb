@@ -1,4 +1,4 @@
-import { collection, addDoc, deleteDoc, doc, onSnapshot, orderBy, query, updateDoc } from 'firebase/firestore'
+import { collection, addDoc, deleteDoc, doc, onSnapshot, orderBy, query, updateDoc, increment } from 'firebase/firestore'
 import { db } from './config.js'
 
 const suggestionsCol = collection(db, 'suggestions')
@@ -32,9 +32,10 @@ export function subscribeToComments(suggestionId, callback) {
   })
 }
 
-export function addComment(suggestionId, { text, authorName }) {
-  return addDoc(
+export async function addComment(suggestionId, { text, authorName }) {
+  await addDoc(
     collection(db, 'suggestions', suggestionId, 'comments'),
     { text, authorName, createdAt: new Date().toISOString() }
   )
+  await updateDoc(doc(db, 'suggestions', suggestionId), { commentCount: increment(1) })
 }

@@ -273,9 +273,17 @@ function SuggestionCard({ suggestion, memberName, isOwn, onEdit }) {
               marginTop: 'auto', paddingTop: 8,
             }}>
               <Avatar name={suggestion.suggestedBy} size={18} />
-              <span style={{ fontSize: '0.65rem', color: DS.ash }}>
+              <span style={{ fontSize: '0.65rem', color: DS.ash, flex: 1 }}>
                 {suggestion.suggestedBy}
               </span>
+              {suggestion.commentCount > 0 && (
+                <span style={{
+                  fontSize: '0.6rem', color: DS.ash,
+                  display: 'flex', alignItems: 'center', gap: 2,
+                }}>
+                  💬 {suggestion.commentCount}
+                </span>
+              )}
             </div>
           </div>
         </div>
