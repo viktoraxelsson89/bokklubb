@@ -18,7 +18,7 @@ export default function AuthenticatedLayout() {
               <SuggestionsProvider>
                 <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', overflow: 'hidden' }}>
                   <AppHeader />
-                  <div id="main-scroll" style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch' }}>
+                  <div id="main-scroll" style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch', overscrollBehavior: 'none' }}>
                     <Outlet />
                   </div>
                   <BottomNav />
