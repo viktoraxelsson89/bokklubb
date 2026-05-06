@@ -380,9 +380,16 @@ function SuggestionForm({ memberName, initial, onClose }) {
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
-    const prev = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => { document.body.style.overflow = prev }
+    const scrollY = window.scrollY
+    document.body.style.position = 'fixed'
+    document.body.style.top = `-${scrollY}px`
+    document.body.style.width = '100%'
+    return () => {
+      document.body.style.position = ''
+      document.body.style.top = ''
+      document.body.style.width = ''
+      window.scrollTo(0, scrollY)
+    }
   }, [])
 
   async function handleSubmit(e) {
@@ -436,7 +443,7 @@ function SuggestionForm({ memberName, initial, onClose }) {
           <div style={{ width: 36, height: 4, borderRadius: 2, background: DS.dune }} />
         </div>
 
-        <div style={{ overflowY: 'auto', overscrollBehavior: 'contain', flex: 1, padding: '12px 20px 0' }}>
+        <div style={{ overflowY: 'auto', overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch', flex: 1, padding: '12px 20px 0' }}>
           <div style={{ fontFamily: LORA, fontWeight: 600, fontSize: '1rem', color: DS.ink, marginBottom: 18 }}>
             {isEdit ? 'Redigera tips' : 'Nytt boktips'}
           </div>
