@@ -16,7 +16,7 @@ export default function AuthenticatedLayout() {
             <PlanningProvider>
               <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', overflow: 'hidden' }}>
                 <AppHeader />
-                <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch' }}>
+                <div id="main-scroll" style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch' }}>
                   <Outlet />
                 </div>
                 <BottomNav />

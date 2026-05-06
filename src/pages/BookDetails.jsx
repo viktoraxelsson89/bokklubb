@@ -35,7 +35,7 @@ export default function BookDetails() {
   const { userData } = useAuth()
   const { books, loading } = useBooks()
   const navigate = useNavigate()
-  useEffect(() => { window.scrollTo(0, 0) }, [bookId])
+  useEffect(() => { document.getElementById('main-scroll')?.scrollTo(0, 0) }, [bookId])
 
   if (loading) {
     return (
