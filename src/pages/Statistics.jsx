@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useBooks } from '../context/BooksContext.jsx'
 import { MEMBERS } from '../domain/constants.js'
@@ -26,7 +26,8 @@ const TABS = [
 export default function Statistics() {
   const { books, loading } = useBooks()
   const navigate = useNavigate()
-  const [tab, setTab] = useState('records')
+  const [tab, setTab] = useState(() => sessionStorage.getItem('statistics_tab') ?? 'records')
+  useEffect(() => { sessionStorage.setItem('statistics_tab', tab) }, [tab])
 
   const finalizedBooks = useMemo(
     () => books.filter(b => b.phase === 'finalized'),

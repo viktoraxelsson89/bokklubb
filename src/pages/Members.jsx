@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useBooks } from '../context/BooksContext.jsx'
 import { MEMBERS } from '../domain/constants.js'
@@ -38,7 +38,11 @@ function getMemberStats(finalizedBooks, memberName) {
 export default function Members() {
   const { books, loading } = useBooks()
   const navigate = useNavigate()
-  const [expanded, setExpanded] = useState(null)
+  const [expanded, setExpanded] = useState(() => sessionStorage.getItem('members_expanded') ?? null)
+  useEffect(() => {
+    if (expanded === null) sessionStorage.removeItem('members_expanded')
+    else sessionStorage.setItem('members_expanded', expanded)
+  }, [expanded])
 
   if (loading) {
     return (

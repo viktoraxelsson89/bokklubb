@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useBooks } from '../context/BooksContext.jsx'
 import { getAllSeasons, getBooksBySeason, getSeasonWinner } from '../domain/books.js'
@@ -9,7 +9,14 @@ import { CoverPlaceholder, RatingBadge } from '../components/ui.jsx'
 export default function Seasons() {
   const { books, loading } = useBooks()
   const navigate = useNavigate()
-  const [open, setOpen] = useState(null)
+  const [open, setOpen] = useState(() => {
+    const saved = sessionStorage.getItem('seasons_open')
+    return saved !== null ? Number(saved) : null
+  })
+  useEffect(() => {
+    if (open === null) sessionStorage.removeItem('seasons_open')
+    else sessionStorage.setItem('seasons_open', String(open))
+  }, [open])
 
   if (loading) {
     return (

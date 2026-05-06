@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useBooks } from '../context/BooksContext.jsx'
@@ -43,7 +43,8 @@ export default function Bookshelf() {
   const { books, currentBook, loading } = useBooks()
   const { round } = usePlanning()
   const navigate = useNavigate()
-  const [sortBy, setSortBy] = useState('season')
+  const [sortBy, setSortBy] = useState(() => sessionStorage.getItem('bookshelf_sortby') ?? 'season')
+  useEffect(() => { sessionStorage.setItem('bookshelf_sortby', sortBy) }, [sortBy])
 
   const memberName = userData?.displayName
   const planningActive = round && round.status === 'active'

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useBooks } from '../context/BooksContext.jsx'
 import { useRecipes } from '../context/RecipesContext.jsx'
@@ -14,7 +14,8 @@ import { MutedLabel } from '../components/ui.jsx'
 export default function Kokbok() {
   const { books, loading: booksLoading } = useBooks()
   const { recipes, loading: recipesLoading } = useRecipes()
-  const [season, setSeason] = useState('all')
+  const [season, setSeason] = useState(() => sessionStorage.getItem('kokbok_season') ?? 'all')
+  useEffect(() => { sessionStorage.setItem('kokbok_season', season) }, [season])
   const navigate = useNavigate()
 
   const merged = useMemo(() => getRecipesForKokbok(recipes, books), [recipes, books])
