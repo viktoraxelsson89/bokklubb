@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useSuggestions } from '../context/SuggestionsContext.jsx'
-import { addSuggestion, deleteSuggestion } from '../firebase/suggestions.js'
+import { addSuggestion, deleteSuggestion, updateSuggestion } from '../firebase/suggestions.js'
 import { coverHue, SUGGESTION_COMMENT_MAX, SUGGESTION_DESCRIPTION_MAX } from '../domain/suggestions.js'
 import { Avatar } from '../components/ui.jsx'
 import { DS, LORA } from '../styles/tokens.js'
@@ -10,6 +10,7 @@ export default function Suggestions() {
   const { userData } = useAuth()
   const { suggestions, loading } = useSuggestions()
   const [showForm, setShowForm] = useState(false)
+  const [editingSuggestion, setEditingSuggestion] = useState(null)
   const memberName = userData?.displayName
 
   if (loading) {
@@ -46,18 +47,27 @@ export default function Suggestions() {
                 key={s.id}
                 suggestion={s}
                 isOwn={s.suggestedBy === memberName}
+                onEdit={() => setEditingSuggestion(s)}
               />
             ))}
           </div>
         )}
       </div>
 
-      {!showForm && (
+      {!showForm && !editingSuggestion && (
         <AddFab onClick={() => setShowForm(true)} />
       )}
 
       {showForm && (
-        <AddForm memberName={memberName} onClose={() => setShowForm(false)} />
+        <SuggestionForm memberName={memberName} onClose={() => setShowForm(false)} />
+      )}
+
+      {editingSuggestion && (
+        <SuggestionForm
+          memberName={memberName}
+          initial={editingSuggestion}
+          onClose={() => setEditingSuggestion(null)}
+        />
       )}
     </div>
   )
@@ -65,7 +75,7 @@ export default function Suggestions() {
 
 // ─── Card ─────────────────────────────────────────────────────────────────────
 
-function SuggestionCard({ suggestion, isOwn }) {
+function SuggestionCard({ suggestion, isOwn, onEdit }) {
   const [deleting, setDeleting] = useState(false)
   const [flipped, setFlipped] = useState(false)
   const hue = coverHue(suggestion.title)
@@ -77,17 +87,24 @@ function SuggestionCard({ suggestion, isOwn }) {
     await deleteSuggestion(suggestion.id)
   }
 
+  function handleEdit(e) {
+    e.stopPropagation()
+    onEdit()
+  }
+
   return (
     <div
       onClick={() => hasDescription && setFlipped(f => !f)}
       style={{
         perspective: 900,
         cursor: hasDescription ? 'pointer' : 'default',
+        height: '100%',
       }}
     >
       {/* Rotating inner */}
       <div style={{
         position: 'relative',
+        height: '100%',
         transformStyle: 'preserve-3d',
         transition: 'transform 0.42s cubic-bezier(0.4, 0, 0.2, 1)',
         transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
@@ -104,6 +121,7 @@ function SuggestionCard({ suggestion, isOwn }) {
           outline: '1px solid rgba(156,153,143,0.18)',
           display: 'flex',
           flexDirection: 'column',
+          height: '100%',
         }}>
           {/* Cover */}
           <div style={{ position: 'relative', paddingTop: '150%', overflow: 'hidden' }}>
@@ -143,24 +161,41 @@ function SuggestionCard({ suggestion, isOwn }) {
             )}
 
             {isOwn && (
-              <button
-                onClick={handleDelete}
-                disabled={deleting}
-                style={{
-                  position: 'absolute', top: 7, right: 7,
-                  width: 26, height: 26, borderRadius: '50%',
-                  background: 'rgba(18,19,18,0.55)',
-                  backdropFilter: 'blur(6px)',
-                  border: 'none', cursor: deleting ? 'default' : 'pointer',
-                  color: 'rgba(244,243,241,0.9)',
-                  fontSize: '1rem', lineHeight: 1,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  opacity: deleting ? 0.5 : 1,
-                  transition: 'opacity 0.15s',
-                }}
-              >
-                ×
-              </button>
+              <>
+                <button
+                  onClick={handleEdit}
+                  style={{
+                    position: 'absolute', top: 7, left: 7,
+                    width: 26, height: 26, borderRadius: '50%',
+                    background: 'rgba(18,19,18,0.55)',
+                    backdropFilter: 'blur(6px)',
+                    border: 'none', cursor: 'pointer',
+                    color: 'rgba(244,243,241,0.9)',
+                    fontSize: '0.75rem', lineHeight: 1,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}
+                >
+                  ✏
+                </button>
+                <button
+                  onClick={handleDelete}
+                  disabled={deleting}
+                  style={{
+                    position: 'absolute', top: 7, right: 7,
+                    width: 26, height: 26, borderRadius: '50%',
+                    background: 'rgba(18,19,18,0.55)',
+                    backdropFilter: 'blur(6px)',
+                    border: 'none', cursor: deleting ? 'default' : 'pointer',
+                    color: 'rgba(244,243,241,0.9)',
+                    fontSize: '1rem', lineHeight: 1,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    opacity: deleting ? 0.5 : 1,
+                    transition: 'opacity 0.15s',
+                  }}
+                >
+                  ×
+                </button>
+              </>
             )}
 
             {hasDescription && (
@@ -333,28 +368,45 @@ function AddFab({ onClick }) {
   )
 }
 
-// ─── Add form (bottom sheet) ───────────────────────────────────────────────────
+// ─── Add / Edit form (bottom sheet) ───────────────────────────────────────────
 
-function AddForm({ memberName, onClose }) {
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [coverUrl, setCoverUrl] = useState('')
-  const [comment, setComment] = useState('')
-  const [description, setDescription] = useState('')
+function SuggestionForm({ memberName, initial, onClose }) {
+  const isEdit = !!initial
+  const [title, setTitle] = useState(initial?.title ?? '')
+  const [author, setAuthor] = useState(initial?.author ?? '')
+  const [coverUrl, setCoverUrl] = useState(initial?.coverUrl ?? '')
+  const [comment, setComment] = useState(initial?.comment ?? '')
+  const [description, setDescription] = useState(initial?.description ?? '')
   const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = prev }
+  }, [])
 
   async function handleSubmit(e) {
     e.preventDefault()
     if (!title.trim() || !author.trim()) return
     setSaving(true)
-    await addSuggestion({
-      title: title.trim(),
-      author: author.trim(),
-      coverUrl: coverUrl.trim() || null,
-      comment: comment.trim() || null,
-      description: description.trim() || null,
-      suggestedBy: memberName,
-    })
+    if (isEdit) {
+      await updateSuggestion(initial.id, {
+        title: title.trim(),
+        author: author.trim(),
+        coverUrl: coverUrl.trim() || null,
+        comment: comment.trim() || null,
+        description: description.trim() || null,
+      })
+    } else {
+      await addSuggestion({
+        title: title.trim(),
+        author: author.trim(),
+        coverUrl: coverUrl.trim() || null,
+        comment: comment.trim() || null,
+        description: description.trim() || null,
+        suggestedBy: memberName,
+      })
+    }
     setSaving(false)
     onClose()
   }
@@ -374,22 +426,22 @@ function AddForm({ memberName, onClose }) {
         position: 'fixed', bottom: 0, left: 0, right: 0,
         background: DS.bone,
         borderRadius: '24px 24px 0 0',
-        paddingBottom: 'max(32px, calc(32px + env(safe-area-inset-bottom)))',
         zIndex: 101,
         boxShadow: '0 -8px 32px rgba(18,19,18,0.16)',
         maxHeight: '88dvh',
-        overflowY: 'auto',
+        display: 'flex',
+        flexDirection: 'column',
       }}>
-        <div style={{ display: 'flex', justifyContent: 'center', padding: '12px 0 4px' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', padding: '12px 0 4px', flexShrink: 0 }}>
           <div style={{ width: 36, height: 4, borderRadius: 2, background: DS.dune }} />
         </div>
 
-        <div style={{ padding: '12px 20px 0' }}>
+        <div style={{ overflowY: 'auto', overscrollBehavior: 'contain', flex: 1, padding: '12px 20px 0' }}>
           <div style={{ fontFamily: LORA, fontWeight: 600, fontSize: '1rem', color: DS.ink, marginBottom: 18 }}>
-            Nytt boktips
+            {isEdit ? 'Redigera tips' : 'Nytt boktips'}
           </div>
 
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <form id="suggestion-form" onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             <FormField label="Titel *">
               <input
                 value={title}
@@ -440,22 +492,33 @@ function AddForm({ memberName, onClose }) {
               />
             </FormField>
 
-            <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
-              <button
-                type="submit"
-                disabled={saving || !title.trim() || !author.trim()}
-                style={{
-                  ...primaryBtnStyle,
-                  opacity: (!title.trim() || !author.trim()) ? 0.5 : 1,
-                }}
-              >
-                {saving ? 'Lägger till…' : 'Lägg till'}
-              </button>
-              <button type="button" onClick={onClose} style={ghostBtnStyle}>
-                Avbryt
-              </button>
-            </div>
+            {/* spacer so last field isn't hidden behind sticky buttons */}
+            <div style={{ height: 4 }} />
           </form>
+        </div>
+
+        {/* Sticky button row always visible */}
+        <div style={{
+          flexShrink: 0,
+          padding: 'max(16px, calc(16px + env(safe-area-inset-bottom))) 20px 20px',
+          background: DS.bone,
+          borderTop: '1px solid rgba(156,153,143,0.15)',
+          display: 'flex', gap: 10,
+        }}>
+          <button
+            type="submit"
+            form="suggestion-form"
+            disabled={saving || !title.trim() || !author.trim()}
+            style={{
+              ...primaryBtnStyle,
+              opacity: (!title.trim() || !author.trim()) ? 0.5 : 1,
+            }}
+          >
+            {saving ? (isEdit ? 'Sparar…' : 'Lägger till…') : (isEdit ? 'Spara' : 'Lägg till')}
+          </button>
+          <button type="button" onClick={onClose} style={ghostBtnStyle}>
+            Avbryt
+          </button>
         </div>
       </div>
     </>

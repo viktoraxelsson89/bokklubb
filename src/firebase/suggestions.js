@@ -1,4 +1,4 @@
-import { collection, addDoc, deleteDoc, doc, onSnapshot, orderBy, query } from 'firebase/firestore'
+import { collection, addDoc, deleteDoc, doc, onSnapshot, orderBy, query, updateDoc } from 'firebase/firestore'
 import { db } from './config.js'
 
 const suggestionsCol = collection(db, 'suggestions')
@@ -12,6 +12,10 @@ export function subscribeToSuggestions(callback) {
 
 export function addSuggestion(data) {
   return addDoc(suggestionsCol, { ...data, addedAt: new Date().toISOString() })
+}
+
+export function updateSuggestion(id, data) {
+  return updateDoc(doc(db, 'suggestions', id), data)
 }
 
 export function deleteSuggestion(id) {
