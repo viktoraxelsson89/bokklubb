@@ -232,9 +232,12 @@ function ActiveView({ round, memberName, isAdmin }) {
   const responses = round.responses || {}
   const summary = summarizeDates(proposedDates, responses, MEMBERS)
   const unanswered = hasUnansweredDates(responses, proposedDates, memberName)
+  const today = new Date().toISOString().slice(0, 10)
 
   const perfectDates = summary.filter(s => s.allCan)
   const almostDates  = summary.filter(s => !s.allCan && s.noneCantGo)
+  const futureSummary = summary.filter(s => s.date >= today)
+  const pastSummary   = summary.filter(s => s.date < today)
 
   return (
     <div style={{ minHeight: '100vh', background: DS.gradientBg, color: DS.ink }}>
@@ -260,6 +263,16 @@ function ActiveView({ round, memberName, isAdmin }) {
           {/* Away periods */}
           <AwayPeriodsSection round={round} memberName={memberName} />
 
+          {/* Calendar */}
+          {proposedDates.length > 0 && (
+            <div>
+              <MutedLabel>Kalender</MutedLabel>
+              <div style={{ marginTop: 8 }}>
+                <CalendarView summary={summary} />
+              </div>
+            </div>
+          )}
+
           {/* Dates */}
           <div>
             <MutedLabel>Datum</MutedLabel>
@@ -269,7 +282,7 @@ function ActiveView({ round, memberName, isAdmin }) {
                   Inga datum tillagda än.
                 </div>
               )}
-              {summary.map(s => (
+              {futureSummary.map(s => (
                 <DateCard
                   key={s.date}
                   summary={s}
@@ -279,6 +292,26 @@ function ActiveView({ round, memberName, isAdmin }) {
                   isAdmin={isAdmin}
                 />
               ))}
+              {pastSummary.length > 0 && (
+                <>
+                  {futureSummary.length > 0 && (
+                    <div style={{ fontSize: '0.7rem', color: DS.ash, padding: '6px 0 2px', textAlign: 'center', letterSpacing: '0.04em' }}>
+                      — passerade datum —
+                    </div>
+                  )}
+                  {pastSummary.map(s => (
+                    <div key={s.date} style={{ opacity: 0.4 }}>
+                      <DateCard
+                        summary={s}
+                        myResponse={getEffectiveResponse(responses, memberName, s.date)}
+                        memberName={memberName}
+                        roundId={round.id}
+                        isAdmin={isAdmin}
+                      />
+                    </div>
+                  ))}
+                </>
+              )}
             </div>
           </div>
 
@@ -639,6 +672,118 @@ function AdminSection({ round, summary, proposedDates }) {
           ))}
         </div>
       )}
+    </div>
+  )
+}
+
+// ─── Calendar view ────────────────────────────────────────────────────────────
+
+const CAL_WEEKDAYS = ['Mån', 'Tis', 'Ons', 'Tor', 'Fre', 'Lör', 'Sön']
+const CAL_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'Maj', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec']
+
+function getMonthDays(year, month) {
+  const lastDay = new Date(year, month + 1, 0).getDate()
+  const startOffset = (new Date(year, month, 1).getDay() + 6) % 7
+  const days = []
+  for (let i = 0; i < startOffset; i++) days.push(null)
+  for (let d = 1; d <= lastDay; d++) days.push(d)
+  return days
+}
+
+function toDateStr(year, month, day) {
+  return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+}
+
+function CalendarView({ summary }) {
+  const today = new Date().toISOString().slice(0, 10)
+  const summaryMap = Object.fromEntries(summary.map(s => [s.date, s]))
+  const months = [...new Set(summary.map(s => s.date.slice(0, 7)))].sort()
+  if (months.length === 0) return null
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      {months.map(ym => {
+        const year = parseInt(ym.slice(0, 4))
+        const month = parseInt(ym.slice(5, 7)) - 1
+        return <MonthGrid key={ym} year={year} month={month} summaryMap={summaryMap} today={today} />
+      })}
+      <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', padding: '0 2px', fontSize: '0.68rem', color: DS.ash }}>
+        {[
+          { color: DS.sage,    label: 'Alla kan' },
+          { color: DS.sand,    label: 'Osäkert' },
+          { color: '#c47c7c',  label: 'Någon kan inte' },
+        ].map(({ color, label }) => (
+          <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            <div style={{ width: 8, height: 8, borderRadius: '50%', background: color, flexShrink: 0 }} />
+            {label}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function MonthGrid({ year, month, summaryMap, today }) {
+  const days = getMonthDays(year, month)
+
+  return (
+    <div style={{
+      background: 'rgba(255,255,255,0.55)',
+      borderRadius: 18,
+      padding: '14px 12px',
+      outline: '1px solid rgba(156,153,143,0.2)',
+    }}>
+      <div style={{
+        fontFamily: LORA, fontWeight: 600, fontSize: '0.85rem',
+        color: DS.ink, marginBottom: 10, textAlign: 'center',
+      }}>
+        {CAL_MONTHS[month]} {year}
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2, marginBottom: 4 }}>
+        {CAL_WEEKDAYS.map(d => (
+          <div key={d} style={{ textAlign: 'center', fontSize: '0.58rem', color: DS.ash, fontWeight: 600 }}>
+            {d}
+          </div>
+        ))}
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2 }}>
+        {days.map((day, i) => {
+          if (!day) return <div key={`_${i}`} />
+          const dateStr = toDateStr(year, month, day)
+          const s = summaryMap[dateStr]
+          const isPast = dateStr < today
+
+          let dotColor = null
+          if (s) {
+            if (s.kan_inte.length > 0) dotColor = '#c47c7c'
+            else if (s.allCan)         dotColor = DS.sage
+            else                       dotColor = DS.sand
+          }
+
+          return (
+            <div key={day} style={{
+              display: 'flex', flexDirection: 'column', alignItems: 'center',
+              padding: '3px 1px', opacity: isPast ? 0.35 : 1,
+            }}>
+              <div style={{
+                fontSize: '0.75rem',
+                color: s ? DS.ink : DS.ash,
+                fontWeight: s ? 600 : 400,
+              }}>
+                {day}
+              </div>
+              {dotColor && (
+                <div style={{
+                  width: 6, height: 6, borderRadius: '50%',
+                  background: dotColor, marginTop: 1,
+                }} />
+              )}
+            </div>
+          )
+        })}
+      </div>
     </div>
   )
 }
