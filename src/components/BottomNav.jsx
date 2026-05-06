@@ -16,11 +16,10 @@ export default function BottomNav() {
 
   return (
     <nav style={{
-      position: 'fixed', left: 0, right: 0, bottom: 0,
-      height: 62, background: DS.darkBg,
+      background: DS.darkBg,
       display: 'flex',
-      paddingBottom: 'calc(env(safe-area-inset-bottom) + 6px)',
-      zIndex: 100,
+      flexShrink: 0,
+      paddingBottom: 'env(safe-area-inset-bottom)',
     }}>
       {ITEMS.map(({ id, label, to, match }) => {
         const active = match(pathname)
@@ -46,7 +45,8 @@ function NavBtn({ label, icon, active, onClick }) {
         flex: 1, display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center', gap: 3,
         background: 'none', border: 'none', cursor: 'pointer',
-        padding: '6px 0 0',
+        padding: '8px 0',
+        minHeight: 62,
         fontFamily: 'inherit',
         transition: 'opacity 0.15s',
         minWidth: 0,

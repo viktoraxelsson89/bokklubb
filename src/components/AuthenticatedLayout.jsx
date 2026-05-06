@@ -12,11 +12,13 @@ export default function AuthenticatedLayout() {
       <BooksProvider>
         <RecipesProvider>
           <PhotosProvider>
-            <div style={{ paddingBottom: 80 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', overflow: 'hidden' }}>
               <AppHeader />
-              <Outlet />
+              <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch' }}>
+                <Outlet />
+              </div>
+              <BottomNav />
             </div>
-            <BottomNav />
           </PhotosProvider>
         </RecipesProvider>
       </BooksProvider>

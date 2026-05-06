@@ -27,8 +27,7 @@ export default function AppHeader() {
 
   return (
     <header style={{
-      position: 'sticky',
-      top: 0,
+      flexShrink: 0,
       zIndex: 50,
       background: DS.dune,
       borderBottom: '1px solid rgba(156,153,143,0.25)',
