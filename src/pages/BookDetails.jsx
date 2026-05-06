@@ -70,7 +70,7 @@ export default function BookDetails() {
         <div style={{ padding: '14px 18px 24px', position: 'relative' }}>
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
-            <button onClick={() => navigate('/')} style={heroIconBtn} title="Tillbaka">
+            <button onClick={() => navigate(-1)} style={heroIconBtn} title="Tillbaka">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={DS.soft} strokeWidth="2.5" strokeLinecap="round">
                 <polyline points="15 18 9 12 15 6" />
               </svg>
