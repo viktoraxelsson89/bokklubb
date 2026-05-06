@@ -45,38 +45,6 @@ export default function BottomNav() {
         />
       )}
 
-      {merOpen && (
-        <div style={{
-          position: 'fixed',
-          bottom: 62,
-          right: 0,
-          zIndex: 91,
-          background: '#1e1d1c',
-          borderRadius: '16px 0 0 0',
-          padding: '6px 0 8px',
-          boxShadow: '-4px -4px 20px rgba(18,19,18,0.35)',
-          minWidth: 148,
-        }}>
-          {MER_ITEMS.map(item => (
-            <button
-              key={item.id}
-              onClick={() => handleMerItemClick(item.to)}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 10,
-                width: '100%', padding: '11px 18px',
-                background: 'none', border: 'none', cursor: 'pointer',
-                color: 'rgba(244,243,241,0.85)',
-                fontSize: '0.82rem', fontFamily: 'inherit',
-                textAlign: 'left',
-              }}
-            >
-              {iconFor(item.id, false)}
-              {item.label}
-            </button>
-          ))}
-        </div>
-      )}
-
       <nav style={{
         background: DS.darkBg,
         display: 'flex',
@@ -85,6 +53,37 @@ export default function BottomNav() {
         position: 'relative',
         zIndex: 92,
       }}>
+        {merOpen && (
+          <div style={{
+            position: 'absolute',
+            bottom: '100%',
+            right: 0,
+            background: '#1e1d1c',
+            borderRadius: '16px 0 0 0',
+            padding: '6px 0 8px',
+            boxShadow: '-4px -4px 20px rgba(18,19,18,0.35)',
+            minWidth: 148,
+          }}>
+            {MER_ITEMS.map(item => (
+              <button
+                key={item.id}
+                onClick={() => handleMerItemClick(item.to)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  width: '100%', padding: '11px 18px',
+                  background: 'none', border: 'none', cursor: 'pointer',
+                  color: 'rgba(244,243,241,0.85)',
+                  fontSize: '0.82rem', fontFamily: 'inherit',
+                  textAlign: 'left',
+                }}
+              >
+                {iconFor(item.id, false)}
+                {item.label}
+              </button>
+            ))}
+          </div>
+        )}
+
         {NAV_ITEMS.map(item => {
           const active = item.id === 'mer' ? (merOpen || item.match(pathname)) : item.match(pathname)
           return (
