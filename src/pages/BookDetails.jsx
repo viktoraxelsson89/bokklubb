@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useBooks } from '../context/BooksContext.jsx'
@@ -35,6 +35,7 @@ export default function BookDetails() {
   const { userData } = useAuth()
   const { books, loading } = useBooks()
   const navigate = useNavigate()
+  useEffect(() => { window.scrollTo(0, 0) }, [bookId])
 
   if (loading) {
     return (
