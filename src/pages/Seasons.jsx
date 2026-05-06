@@ -28,7 +28,6 @@ export default function Seasons() {
 
   const finalizedBooks = books.filter(b => b.phase === 'finalized')
   const seasons = getAllSeasons(finalizedBooks)
-  const activeSeason = open ?? seasons[0] ?? null
 
   return (
     <div style={{ minHeight: '100vh', background: DS.gradientBg, color: DS.ink }}>
@@ -52,7 +51,7 @@ export default function Seasons() {
           {seasons.map(season => {
             const seasonBooks = getBooksBySeason(finalizedBooks, season)
             const winner = getSeasonWinner(finalizedBooks, season)
-            const isOpen = activeSeason === season
+            const isOpen = open === season
             const avgAll = seasonBooks.length
               ? seasonBooks.reduce((a, b) => a + getDisplayAverage(b), 0) / seasonBooks.length
               : 0
@@ -141,6 +140,7 @@ export default function Seasons() {
                     outline: '1px solid rgba(156,153,143,0.15)',
                     borderTop: 'none',
                     overflow: 'hidden',
+                    animation: 'slideDown 0.18s ease',
                   }}>
                     {[...seasonBooks]
                       .sort((a, b) => getDisplayAverage(b) - getDisplayAverage(a))
