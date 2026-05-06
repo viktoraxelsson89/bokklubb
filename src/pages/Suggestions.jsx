@@ -380,16 +380,11 @@ function SuggestionForm({ memberName, initial, onClose }) {
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
-    const scrollY = window.scrollY
-    document.body.style.position = 'fixed'
-    document.body.style.top = `-${scrollY}px`
-    document.body.style.width = '100%'
-    return () => {
-      document.body.style.position = ''
-      document.body.style.top = ''
-      document.body.style.width = ''
-      window.scrollTo(0, scrollY)
-    }
+    const el = document.getElementById('main-scroll')
+    if (!el) return
+    const prev = el.style.overflow
+    el.style.overflow = 'hidden'
+    return () => { el.style.overflow = prev }
   }, [])
 
   async function handleSubmit(e) {
@@ -430,12 +425,14 @@ function SuggestionForm({ memberName, initial, onClose }) {
         }}
       />
       <div style={{
-        position: 'fixed', bottom: 0, left: 0, right: 0,
+        position: 'fixed',
+        bottom: 'calc(62px + env(safe-area-inset-bottom))',
+        left: 0, right: 0,
         background: DS.bone,
         borderRadius: '24px 24px 0 0',
         zIndex: 101,
         boxShadow: '0 -8px 32px rgba(18,19,18,0.16)',
-        maxHeight: '88dvh',
+        maxHeight: 'calc(88dvh - 62px - env(safe-area-inset-bottom))',
         display: 'flex',
         flexDirection: 'column',
       }}>
@@ -507,7 +504,7 @@ function SuggestionForm({ memberName, initial, onClose }) {
         {/* Sticky button row always visible */}
         <div style={{
           flexShrink: 0,
-          padding: 'max(16px, calc(16px + env(safe-area-inset-bottom))) 20px 20px',
+          padding: '16px 20px 20px',
           background: DS.bone,
           borderTop: '1px solid rgba(156,153,143,0.15)',
           display: 'flex', gap: 10,
