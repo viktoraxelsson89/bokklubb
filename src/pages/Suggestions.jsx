@@ -83,6 +83,7 @@ function SuggestionCard({ suggestion, memberName, isOwn, onEdit }) {
   const [replyText, setReplyText] = useState('')
   const [sending, setSending] = useState(false)
   const commentsEndRef = useRef(null)
+  const didScrollRef = useRef(false)
   const hue = coverHue(suggestion.title)
   const hasDescription = !!suggestion.description
 
@@ -120,10 +121,13 @@ function SuggestionCard({ suggestion, memberName, isOwn, onEdit }) {
 
   return (
     <div
-      onClick={() => hasDescription && setFlipped(f => !f)}
+      onClick={() => {
+        if (didScrollRef.current) { didScrollRef.current = false; return }
+        setFlipped(f => !f)
+      }}
       style={{
         perspective: 900,
-        cursor: hasDescription ? 'pointer' : 'default',
+        cursor: 'pointer',
         height: '100%',
       }}
     >
@@ -304,7 +308,7 @@ function SuggestionCard({ suggestion, memberName, isOwn, onEdit }) {
 
           {/* Scrollable body: description + comments */}
           <div
-            onClick={e => e.stopPropagation()}
+            onScroll={() => { didScrollRef.current = true }}
             style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}
           >
             {suggestion.description && (
