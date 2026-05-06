@@ -21,3 +21,20 @@ export function updateSuggestion(id, data) {
 export function deleteSuggestion(id) {
   return deleteDoc(doc(db, 'suggestions', id))
 }
+
+export function subscribeToComments(suggestionId, callback) {
+  const q = query(
+    collection(db, 'suggestions', suggestionId, 'comments'),
+    orderBy('createdAt', 'asc')
+  )
+  return onSnapshot(q, snap => {
+    callback(snap.docs.map(d => ({ id: d.id, ...d.data() })))
+  })
+}
+
+export function addComment(suggestionId, { text, authorName }) {
+  return addDoc(
+    collection(db, 'suggestions', suggestionId, 'comments'),
+    { text, authorName, createdAt: new Date().toISOString() }
+  )
+}

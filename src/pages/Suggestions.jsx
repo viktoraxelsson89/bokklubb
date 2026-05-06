@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useSuggestions } from '../context/SuggestionsContext.jsx'
-import { addSuggestion, deleteSuggestion, updateSuggestion } from '../firebase/suggestions.js'
-import { coverHue, SUGGESTION_COMMENT_MAX, SUGGESTION_DESCRIPTION_MAX } from '../domain/suggestions.js'
+import { addSuggestion, deleteSuggestion, updateSuggestion, subscribeToComments, addComment } from '../firebase/suggestions.js'
+import { coverHue, SUGGESTION_COMMENT_MAX, SUGGESTION_DESCRIPTION_MAX, SUGGESTION_REPLY_MAX } from '../domain/suggestions.js'
 import { Avatar } from '../components/ui.jsx'
 import { DS, LORA } from '../styles/tokens.js'
 
@@ -46,6 +46,7 @@ export default function Suggestions() {
               <SuggestionCard
                 key={s.id}
                 suggestion={s}
+                memberName={memberName}
                 isOwn={s.suggestedBy === memberName}
                 onEdit={() => setEditingSuggestion(s)}
               />
@@ -75,11 +76,36 @@ export default function Suggestions() {
 
 // ─── Card ─────────────────────────────────────────────────────────────────────
 
-function SuggestionCard({ suggestion, isOwn, onEdit }) {
+function SuggestionCard({ suggestion, memberName, isOwn, onEdit }) {
   const [deleting, setDeleting] = useState(false)
   const [flipped, setFlipped] = useState(false)
+  const [comments, setComments] = useState([])
+  const [replyText, setReplyText] = useState('')
+  const [sending, setSending] = useState(false)
+  const commentsEndRef = useRef(null)
   const hue = coverHue(suggestion.title)
   const hasDescription = !!suggestion.description
+
+  useEffect(() => {
+    if (!flipped) return
+    return subscribeToComments(suggestion.id, setComments)
+  }, [flipped, suggestion.id])
+
+  useEffect(() => {
+    if (flipped && commentsEndRef.current) {
+      commentsEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    }
+  }, [comments.length, flipped])
+
+  async function handleReply(e) {
+    if (e.key !== 'Enter') return
+    const text = replyText.trim()
+    if (!text || sending || !memberName) return
+    setSending(true)
+    await addComment(suggestion.id, { text, authorName: memberName })
+    setReplyText('')
+    setSending(false)
+  }
 
   async function handleDelete(e) {
     e.stopPropagation()
@@ -262,9 +288,11 @@ function SuggestionCard({ suggestion, isOwn, onEdit }) {
           boxShadow: '0 2px 14px rgba(18,19,18,0.07)',
           display: 'flex',
           flexDirection: 'column',
-          padding: '14px 13px 12px',
+          padding: '14px 13px 10px',
           overflow: 'hidden',
+          boxSizing: 'border-box',
         }}>
+          {/* Title label */}
           <div style={{
             fontSize: '0.65rem', fontWeight: 600,
             color: `oklch(52% 0.08 ${hue})`,
@@ -274,25 +302,68 @@ function SuggestionCard({ suggestion, isOwn, onEdit }) {
             {suggestion.title}
           </div>
 
-          <div style={{
-            fontSize: '0.73rem',
-            color: DS.soft,
-            lineHeight: 1.6,
-            overflowY: 'auto',
-            flex: 1,
-          }}>
-            {suggestion.description}
+          {/* Scrollable body: description + comments */}
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}
+          >
+            {suggestion.description && (
+              <div style={{
+                fontSize: '0.73rem', color: DS.soft,
+                lineHeight: 1.6, marginBottom: 10,
+              }}>
+                {suggestion.description}
+              </div>
+            )}
+
+            <div style={{ height: 1, background: `oklch(88% 0.03 ${hue})`, marginBottom: 8 }} />
+
+            <div style={{
+              fontSize: '0.6rem', fontWeight: 600,
+              color: `oklch(52% 0.08 ${hue})`,
+              letterSpacing: '0.06em', textTransform: 'uppercase',
+              marginBottom: 6,
+            }}>
+              {comments.length > 0 ? `Kommentarer (${comments.length})` : 'Kommentarer'}
+            </div>
+
+            {comments.length === 0 && (
+              <div style={{ fontSize: '0.68rem', color: DS.ash, fontStyle: 'italic', marginBottom: 6 }}>
+                Inga kommentarer än.
+              </div>
+            )}
+
+            {comments.map(c => (
+              <div key={c.id} style={{ marginBottom: 5 }}>
+                <span style={{ fontWeight: 600, fontSize: '0.68rem', color: DS.soft }}>{c.authorName}: </span>
+                <span style={{ fontSize: '0.68rem', color: DS.ash }}>{c.text}</span>
+              </div>
+            ))}
+
+            <div ref={commentsEndRef} />
           </div>
 
-          <div style={{
-            marginTop: 10, flexShrink: 0,
-            fontSize: '0.6rem',
-            color: `oklch(62% 0.06 ${hue})`,
-            textAlign: 'center',
-            letterSpacing: '0.04em',
-          }}>
-            tryck för att vända
-          </div>
+          {/* Reply input */}
+          <input
+            value={replyText}
+            onChange={e => setReplyText(e.target.value.slice(0, SUGGESTION_REPLY_MAX))}
+            onKeyDown={handleReply}
+            onClick={e => e.stopPropagation()}
+            placeholder={memberName ? 'Kommentera… (Enter)' : ''}
+            disabled={sending || !memberName}
+            style={{
+              marginTop: 8, flexShrink: 0,
+              width: '100%', boxSizing: 'border-box',
+              padding: '6px 10px',
+              borderRadius: 8,
+              border: `1px solid oklch(82% 0.04 ${hue})`,
+              background: `oklch(99% 0.005 ${hue})`,
+              fontSize: '0.72rem',
+              fontFamily: 'inherit',
+              color: DS.ink,
+              outline: 'none',
+            }}
+          />
         </div>
 
       </div>

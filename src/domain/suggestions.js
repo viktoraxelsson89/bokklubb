@@ -1,5 +1,6 @@
 export const SUGGESTION_COMMENT_MAX = 200
 export const SUGGESTION_DESCRIPTION_MAX = 600
+export const SUGGESTION_REPLY_MAX = 150
 
 export function validateSuggestion({ title, author }) {
   if (!title || !title.trim()) return 'Titel krävs'
