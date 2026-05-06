@@ -2,12 +2,13 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { DS } from '../styles/tokens.js'
 
 const ITEMS = [
-  { id: 'bookshelf', label: 'Bokhylla',  to: '/',         match: p => p === '/' || p.startsWith('/books/') },
-  { id: 'seasons',   label: 'Säsonger',  to: '/seasons',  match: p => p === '/seasons' },
-  { id: 'members',   label: 'Medlemmar', to: '/members',  match: p => p === '/members' },
-  { id: 'stats',     label: 'Statistik', to: '/stats',    match: p => p === '/stats' },
-  { id: 'food',      label: 'Kokbok',    to: '/kokbok',   match: p => p === '/kokbok' },
-  { id: 'photos',    label: 'Bilder',    to: '/bilder',   match: p => p === '/bilder' },
+  { id: 'bookshelf', label: 'Bokhylla',  to: '/',          match: p => p === '/' || p.startsWith('/books/') },
+  { id: 'seasons',   label: 'Säsonger',  to: '/seasons',   match: p => p === '/seasons' },
+  { id: 'members',   label: 'Medlemmar', to: '/members',   match: p => p === '/members' },
+  { id: 'stats',     label: 'Statistik', to: '/stats',     match: p => p === '/stats' },
+  { id: 'food',      label: 'Kokbok',    to: '/kokbok',    match: p => p === '/kokbok' },
+  { id: 'photos',    label: 'Bilder',    to: '/bilder',    match: p => p === '/bilder' },
+  { id: 'planning',  label: 'Planering', to: '/planning',  match: p => p === '/planning' },
 ]
 
 export default function BottomNav() {
@@ -79,7 +80,8 @@ function iconFor(id, active) {
     case 'members':   return <IconPeople active={active} />
     case 'stats':     return <IconChart  active={active} />
     case 'food':      return <IconFood   active={active} />
-    case 'photos':    return <IconPhoto  active={active} />
+    case 'photos':    return <IconPhoto    active={active} />
+    case 'planning':  return <IconPlanning active={active} />
     default:          return null
   }
 }
@@ -142,6 +144,18 @@ function IconPhoto({ active }) {
       <rect x="3" y="3" width="18" height="18" rx="2" />
       <circle cx="8.5" cy="8.5" r="1.5" />
       <polyline points="21 15 16 10 5 21" />
+    </svg>
+  )
+}
+function IconPlanning({ active }) {
+  return (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={strokeColor(active)} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2" />
+      <line x1="16" y1="2" x2="16" y2="6" />
+      <line x1="8" y1="2" x2="8" y2="6" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+      <line x1="8" y1="15" x2="10" y2="15" />
+      <line x1="14" y1="15" x2="16" y2="15" />
     </svg>
   )
 }

@@ -1,4 +1,6 @@
 import { useBooks } from '../context/BooksContext.jsx'
+import { usePlanning } from '../context/PlanningContext.jsx'
+import { formatDateSv } from '../domain/planning.js'
 import { DS, LORA } from '../styles/tokens.js'
 
 const CLUB_NAME = 'Shuu of Books'
@@ -23,7 +25,10 @@ function deriveHeaderInfo(books) {
 
 export default function AppHeader() {
   const { books } = useBooks()
+  const { round } = usePlanning()
   const { season, nextHost } = deriveHeaderInfo(books)
+
+  const lockedDate = round?.status === 'locked' ? round.lockedDate : null
 
   return (
     <header style={{
@@ -60,6 +65,12 @@ export default function AppHeader() {
         {season != null && <span>Säsong {season}</span>}
         {season != null && nextHost && <span> · </span>}
         {nextHost && <span>Nästa: {nextHost}</span>}
+        {lockedDate && (
+          <>
+            <br />
+            <span style={{ color: DS.sage, fontWeight: 500 }}>📅 {formatDateSv(lockedDate)}</span>
+          </>
+        )}
       </div>
     </header>
   )

@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useBooks } from '../context/BooksContext.jsx'
+import { usePlanning } from '../context/PlanningContext.jsx'
+import { hasUnansweredDates, formatDateSv } from '../domain/planning.js'
 import { getAllSeasons, getBooksBySeason } from '../domain/books.js'
 import { getDisplayAverage } from '../domain/calculations.js'
 import { DS, LORA } from '../styles/tokens.js'
@@ -39,8 +41,15 @@ function sortFinalized(books, sortBy) {
 export default function Bookshelf() {
   const { userData, logout } = useAuth()
   const { books, currentBook, loading } = useBooks()
+  const { round } = usePlanning()
   const navigate = useNavigate()
   const [sortBy, setSortBy] = useState('season')
+
+  const memberName = userData?.displayName
+  const planningActive = round && round.status === 'active'
+  const planningLocked = round && round.status === 'locked'
+  const planningUnanswered = planningActive && memberName &&
+    hasUnansweredDates(round.responses || {}, round.proposedDates || [], memberName)
 
   if (loading) {
     return (
@@ -178,6 +187,75 @@ export default function Bookshelf() {
                     </span>
                   </div>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* Planning: locked date card */}
+          {planningLocked && (
+            <div style={{ marginBottom: 20 }}>
+              <MutedLabel>Nästa träff</MutedLabel>
+              <div
+                onClick={() => navigate('/planning')}
+                style={{
+                  marginTop: 8,
+                  background: 'rgba(186,209,150,0.22)',
+                  borderRadius: 20,
+                  padding: '14px 18px',
+                  display: 'flex', alignItems: 'center', gap: 14,
+                  cursor: 'pointer',
+                  outline: '1.5px solid rgba(186,209,150,0.55)',
+                  transition: 'transform 0.15s ease',
+                }}
+                onMouseDown={e => { e.currentTarget.style.transform = 'scale(0.99)' }}
+                onMouseUp={e => { e.currentTarget.style.transform = 'none' }}
+                onMouseLeave={e => { e.currentTarget.style.transform = 'none' }}
+              >
+                <span style={{ fontSize: '1.4rem' }}>📅</span>
+                <div>
+                  <div style={{ fontFamily: LORA, fontWeight: 600, fontSize: '0.95rem', color: DS.ink, marginBottom: 1 }}>
+                    {formatDateSv(round.lockedDate)}
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: DS.ash }}>{round.title}</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Planning: active round CTA */}
+          {planningActive && (
+            <div style={{ marginBottom: 20 }}>
+              <div
+                onClick={() => navigate('/planning')}
+                style={{
+                  background: planningUnanswered
+                    ? 'rgba(201,192,148,0.28)'
+                    : 'rgba(186,209,150,0.15)',
+                  borderRadius: 16,
+                  padding: '11px 16px',
+                  display: 'flex', alignItems: 'center', gap: 12,
+                  cursor: 'pointer',
+                  outline: planningUnanswered
+                    ? '1px solid rgba(201,192,148,0.5)'
+                    : '1px solid rgba(186,209,150,0.35)',
+                  transition: 'transform 0.15s ease',
+                }}
+                onMouseDown={e => { e.currentTarget.style.transform = 'scale(0.99)' }}
+                onMouseUp={e => { e.currentTarget.style.transform = 'none' }}
+                onMouseLeave={e => { e.currentTarget.style.transform = 'none' }}
+              >
+                <span style={{ fontSize: '1.1rem' }}>📅</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: '0.82rem', color: DS.ink, fontWeight: 500 }}>
+                    {round.title}
+                  </div>
+                  {planningUnanswered && (
+                    <div style={{ fontSize: '0.72rem', color: DS.soft }}>
+                      Du har inte svarat på alla datum.
+                    </div>
+                  )}
+                </div>
+                <span style={{ fontSize: '0.75rem', color: DS.ash, flexShrink: 0 }}>→</span>
               </div>
             </div>
           )}

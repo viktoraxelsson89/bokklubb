@@ -13,6 +13,7 @@ import Kokbok from './pages/Kokbok.jsx'
 import RecipeDetails from './pages/RecipeDetails.jsx'
 import RecipeEdit from './pages/RecipeEdit.jsx'
 import Bilder from './pages/Bilder.jsx'
+import Planning from './pages/Planning.jsx'
 import Placeholder from './pages/Placeholder.jsx'
 
 export default function App() {
@@ -34,6 +35,7 @@ export default function App() {
             <Route path="/recipes/:recipeId/edit" element={<RecipeEdit />} />
             <Route path="/books/:bookId/recipes/new" element={<RecipeEdit />} />
             <Route path="/bilder"  element={<Bilder />} />
+            <Route path="/planning" element={<Planning />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
