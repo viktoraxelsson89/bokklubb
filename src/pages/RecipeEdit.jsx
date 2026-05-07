@@ -118,7 +118,7 @@ export default function RecipeEdit() {
         await updateRecipe(targetId, { imagePath: path, imageUrl: url, updatedAt: new Date().toISOString() })
       }
 
-      navigate(`/recipes/${targetId}`)
+      navigate(`/recipes/${targetId}`, { replace: true })
     } catch (err) {
       setError(err.message || 'Kunde inte spara')
       setSubmitting(false)

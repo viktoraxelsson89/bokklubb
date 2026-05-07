@@ -262,6 +262,60 @@ export function IconButton({
   )
 }
 
+export function PageHeader({ title, subtitle, onBack, backLabel = 'Tillbaka', actions }) {
+  return (
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: 10,
+      marginBottom: 18,
+      padding: '0 4px',
+      minHeight: 38,
+    }}>
+      {onBack && (
+        <IconButton onClick={onBack} label={backLabel} size={38}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+        </IconButton>
+      )}
+
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{
+          fontFamily: LORA,
+          fontWeight: 600,
+          fontSize: '1.05rem',
+          color: DS.ink,
+          lineHeight: 1.25,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+        }}>
+          {title}
+        </div>
+        {subtitle && (
+          <div style={{
+            fontSize: '0.72rem',
+            color: DS.ash,
+            marginTop: 2,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}>
+            {subtitle}
+          </div>
+        )}
+      </div>
+
+      {actions && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+          {actions}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export function LoadingState({ text = 'Laddar...' }) {
   return (
     <div style={{ minHeight: '100vh', background: DS.gradientBg, padding: 24, color: DS.soft }}>

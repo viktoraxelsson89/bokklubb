@@ -5,8 +5,8 @@ import { useBooks } from '../context/BooksContext.jsx'
 import { addBook, setCurrentBook } from '../firebase/books.js'
 import { buildNewBookDoc, validateNewBookForm } from '../domain/bookCreate.js'
 import { MEMBERS } from '../domain/constants.js'
-import { DS, LORA } from '../styles/tokens.js'
-import { CoverPlaceholder, IconButton, MutedLabel, PrimaryBtn } from '../components/ui.jsx'
+import { DS } from '../styles/tokens.js'
+import { CoverPlaceholder, MutedLabel, PageHeader, PrimaryBtn } from '../components/ui.jsx'
 
 export default function BookAdd() {
   const { userData } = useAuth()
@@ -50,7 +50,7 @@ export default function BookAdd() {
       if (makeCurrent) {
         await setCurrentBook(ref.id, books)
       }
-      navigate(`/books/${ref.id}`)
+      navigate(`/books/${ref.id}`, { replace: true })
     } catch (err) {
       setError(err.message || 'Kunde inte spara')
       setSubmitting(false)
@@ -61,14 +61,7 @@ export default function BookAdd() {
     <div style={{ minHeight: '100vh', background: DS.gradientBg, color: DS.ink }}>
       <div style={{ maxWidth: 760, margin: '0 auto', padding: '18px 14px 32px' }}>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18, padding: '0 4px' }}>
-          <IconButton onClick={() => navigate(-1)} label="Tillbaka" size={30}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
-          </IconButton>
-          <div style={{ fontFamily: LORA, fontWeight: 600, fontSize: '1.05rem' }}>Ny bok</div>
-        </div>
+        <PageHeader title="Ny bok" onBack={() => navigate(-1)} />
 
         <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
 

@@ -5,8 +5,8 @@ import { useBooks } from '../context/BooksContext.jsx'
 import { updateBook } from '../firebase/books.js'
 import { buildBookUpdates, buildFormFromBook } from '../domain/bookEdit.js'
 import { BOOK_PHASES, MEMBERS, COMMENT_MAX_LENGTH } from '../domain/constants.js'
-import { DS, LORA } from '../styles/tokens.js'
-import { Avatar, IconButton, LoadingState, MutedLabel, PrimaryBtn } from '../components/ui.jsx'
+import { DS } from '../styles/tokens.js'
+import { Avatar, LoadingState, MutedLabel, PageHeader, PrimaryBtn } from '../components/ui.jsx'
 
 const PHASE_OPTIONS = [
   { value: BOOK_PHASES.PRELIMINARY_VOTING, label: 'Förhandsröstning' },
@@ -49,7 +49,7 @@ export default function BookEdit() {
     try {
       const updates = buildBookUpdates(book, form)
       await updateBook(book.id, updates)
-      navigate(`/books/${book.id}`)
+      navigate(`/books/${book.id}`, { replace: true })
     } catch (err) {
       setError(err.message || 'Kunde inte spara')
       setSubmitting(false)
@@ -60,14 +60,7 @@ export default function BookEdit() {
     <div style={{ minHeight: '100vh', background: DS.gradientBg, color: DS.ink }}>
       <div style={{ maxWidth: 760, margin: '0 auto', padding: '18px 14px 32px' }}>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18, padding: '0 4px' }}>
-          <IconButton onClick={() => navigate(`/books/${book.id}`)} label="Tillbaka" size={30}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
-          </IconButton>
-          <div style={{ fontFamily: LORA, fontWeight: 600, fontSize: '1.05rem' }}>Redigera bok</div>
-        </div>
+        <PageHeader title="Redigera bok" onBack={() => navigate(`/books/${book.id}`, { replace: true })} />
 
         <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
 
