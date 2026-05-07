@@ -1,40 +1,103 @@
+import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { DS } from '../styles/tokens.js'
 
-const ITEMS = [
-  { id: 'bookshelf', label: 'Bokhylla',  to: '/',          match: p => p === '/' || p.startsWith('/books/') },
-  { id: 'seasons',   label: 'Säsonger',  to: '/seasons',   match: p => p === '/seasons' },
-  { id: 'members',   label: 'Medlemmar', to: '/members',   match: p => p === '/members' },
-  { id: 'stats',     label: 'Statistik', to: '/stats',     match: p => p === '/stats' },
-  { id: 'food',      label: 'Kokbok',    to: '/kokbok',    match: p => p === '/kokbok' },
-  { id: 'photos',    label: 'Bilder',    to: '/bilder',    match: p => p === '/bilder' },
-  { id: 'planning',  label: 'Planering', to: '/planning',  match: p => p === '/planning' },
+const NAV_ITEMS = [
+  { id: 'bookshelf', label: 'Bokhylla',  to: '/',         match: p => p === '/' || p.startsWith('/books/') },
+  { id: 'seasons',   label: 'Säsonger',  to: '/seasons',  match: p => p === '/seasons' },
+  { id: 'tips',      label: 'Tips',      to: '/tips',     match: p => p === '/tips' },
+  { id: 'members',   label: 'Klubben',   to: '/members',  match: p => p === '/members' },
+  { id: 'stats',     label: 'Statistik', to: '/stats',    match: p => p === '/stats' },
+  { id: 'planning',  label: 'Planering', to: '/planning', match: p => p === '/planning' },
+  { id: 'mer',       label: 'Mer',       to: null,        match: p => p === '/kokbok' || p.startsWith('/recipes') || p === '/bilder' },
+]
+
+const MER_ITEMS = [
+  { id: 'food',   label: 'Kokbok', to: '/kokbok' },
+  { id: 'photos', label: 'Bilder', to: '/bilder' },
 ]
 
 export default function BottomNav() {
   const { pathname } = useLocation()
   const navigate = useNavigate()
+  const [merOpen, setMerOpen] = useState(false)
+
+  function handleNavClick(item) {
+    if (item.id === 'mer') {
+      setMerOpen(o => !o)
+    } else {
+      setMerOpen(false)
+      navigate(item.to)
+    }
+  }
+
+  function handleMerItemClick(to) {
+    setMerOpen(false)
+    navigate(to)
+  }
 
   return (
-    <nav style={{
-      background: DS.darkBg,
-      display: 'flex',
-      flexShrink: 0,
-      paddingBottom: 'env(safe-area-inset-bottom)',
-    }}>
-      {ITEMS.map(({ id, label, to, match }) => {
-        const active = match(pathname)
-        return (
-          <NavBtn
-            key={id}
-            label={label}
-            icon={iconFor(id, active)}
-            active={active}
-            onClick={() => navigate(to)}
-          />
-        )
-      })}
-    </nav>
+    <>
+      {merOpen && (
+        <div
+          onClick={() => setMerOpen(false)}
+          style={{ position: 'fixed', inset: 0, zIndex: 90 }}
+        />
+      )}
+
+      <nav style={{
+        background: DS.darkBg,
+        display: 'flex',
+        flexShrink: 0,
+        paddingBottom: 'env(safe-area-inset-bottom)',
+        position: 'relative',
+        zIndex: 92,
+      }}>
+        {merOpen && (
+          <div style={{
+            position: 'absolute',
+            bottom: '100%',
+            right: 0,
+            background: '#1e1d1c',
+            borderRadius: '16px 0 0 0',
+            padding: '6px 0 8px',
+            boxShadow: '-4px -4px 20px rgba(18,19,18,0.35)',
+            minWidth: 148,
+          }}>
+            {MER_ITEMS.map(item => (
+              <button
+                key={item.id}
+                onClick={() => handleMerItemClick(item.to)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  width: '100%', padding: '11px 18px',
+                  background: 'none', border: 'none', cursor: 'pointer',
+                  color: 'rgba(244,243,241,0.85)',
+                  fontSize: '0.82rem', fontFamily: 'inherit',
+                  textAlign: 'left',
+                }}
+              >
+                {iconFor(item.id, false)}
+                {item.label}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {NAV_ITEMS.map(item => {
+          const active = item.id === 'mer' ? (merOpen || item.match(pathname)) : item.match(pathname)
+          return (
+            <NavBtn
+              key={item.id}
+              label={item.label}
+              icon={iconFor(item.id, active)}
+              active={active}
+              onClick={() => handleNavClick(item)}
+            />
+          )
+        })}
+      </nav>
+    </>
   )
 }
 
@@ -75,13 +138,15 @@ function NavBtn({ label, icon, active, onClick }) {
 
 function iconFor(id, active) {
   switch (id) {
-    case 'bookshelf': return <IconBook   active={active} />
-    case 'seasons':   return <IconCal    active={active} />
-    case 'members':   return <IconPeople active={active} />
-    case 'stats':     return <IconChart  active={active} />
-    case 'food':      return <IconFood   active={active} />
-    case 'photos':    return <IconPhoto    active={active} />
+    case 'bookshelf': return <IconBook     active={active} />
+    case 'seasons':   return <IconCal      active={active} />
+    case 'tips':      return <IconTips     active={active} />
+    case 'members':   return <IconPeople   active={active} />
+    case 'stats':     return <IconChart    active={active} />
     case 'planning':  return <IconPlanning active={active} />
+    case 'mer':       return <IconMer      active={active} />
+    case 'food':      return <IconFood     active={active} />
+    case 'photos':    return <IconPhoto    active={active} />
     default:          return null
   }
 }
@@ -108,6 +173,15 @@ function IconCal({ active }) {
     </svg>
   )
 }
+function IconTips({ active }) {
+  return (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={strokeColor(active)} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="12" y1="8" x2="12" y2="12" />
+      <line x1="12" y1="16" x2="12.01" y2="16" />
+    </svg>
+  )
+}
 function IconPeople({ active }) {
   return (
     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={strokeColor(active)} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -124,6 +198,27 @@ function IconChart({ active }) {
       <line x1="18" y1="20" x2="18" y2="10" />
       <line x1="12" y1="20" x2="12" y2="4" />
       <line x1="6" y1="20" x2="6" y2="14" />
+    </svg>
+  )
+}
+function IconPlanning({ active }) {
+  return (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={strokeColor(active)} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2" />
+      <line x1="16" y1="2" x2="16" y2="6" />
+      <line x1="8" y1="2" x2="8" y2="6" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+      <line x1="8" y1="15" x2="10" y2="15" />
+      <line x1="14" y1="15" x2="16" y2="15" />
+    </svg>
+  )
+}
+function IconMer({ active }) {
+  return (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={strokeColor(active)} strokeWidth="2.5" strokeLinecap="round">
+      <circle cx="5"  cy="12" r="1" fill={strokeColor(active)} stroke="none" />
+      <circle cx="12" cy="12" r="1" fill={strokeColor(active)} stroke="none" />
+      <circle cx="19" cy="12" r="1" fill={strokeColor(active)} stroke="none" />
     </svg>
   )
 }
@@ -144,18 +239,6 @@ function IconPhoto({ active }) {
       <rect x="3" y="3" width="18" height="18" rx="2" />
       <circle cx="8.5" cy="8.5" r="1.5" />
       <polyline points="21 15 16 10 5 21" />
-    </svg>
-  )
-}
-function IconPlanning({ active }) {
-  return (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={strokeColor(active)} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="4" width="18" height="18" rx="2" />
-      <line x1="16" y1="2" x2="16" y2="6" />
-      <line x1="8" y1="2" x2="8" y2="6" />
-      <line x1="3" y1="10" x2="21" y2="10" />
-      <line x1="8" y1="15" x2="10" y2="15" />
-      <line x1="14" y1="15" x2="16" y2="15" />
     </svg>
   )
 }

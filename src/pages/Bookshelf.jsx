@@ -187,6 +187,11 @@ export default function Bookshelf() {
                       {finalsSubmitted}/5 omdömen
                     </span>
                   </div>
+                  {currentBook.meetingDate && (
+                    <div style={{ marginTop: 8, fontSize: '0.72rem', color: DS.ash }}>
+                      Träff {formatDateSv(currentBook.meetingDate)}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
