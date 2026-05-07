@@ -23,6 +23,10 @@ import {
 
 const SLIDE_UP_KEYFRAMES = `@keyframes bookDetailSlideUp { from { transform: translateY(28px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }`
 
+function canGoBack() {
+  return typeof window !== 'undefined' && window.history.state?.idx > 0
+}
+
 export default function BookDetails() {
   const { bookId } = useParams()
   const { userData } = useAuth()
@@ -45,6 +49,7 @@ export default function BookDetails() {
 
   const phase = book.phase || BOOK_PHASES.PRELIMINARY_VOTING
   const avg = getDisplayAverage(book)
+  const handleBack = () => canGoBack() ? navigate(-1) : navigate('/')
 
   return (
     <div style={{
@@ -60,13 +65,13 @@ export default function BookDetails() {
         <div style={{ padding: '14px 18px 24px', position: 'relative' }}>
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
-            <IconButton onClick={() => navigate(-1)} label="Tillbaka">
+            <IconButton onClick={handleBack} label="Tillbaka">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                 <polyline points="15 18 9 12 15 6" />
               </svg>
             </IconButton>
             {userData?.role === 'admin' && (
-              <IconButton onClick={() => navigate(`/books/${book.id}/edit`)} label="Redigera">
+              <IconButton onClick={() => navigate(`/books/${book.id}/edit`, { state: { from: 'book-details' } })} label="Redigera">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 20h9" />
                   <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />

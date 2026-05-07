@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
-import { useNavigate, useParams, Navigate, useSearchParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams, Navigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useBooks } from '../context/BooksContext.jsx'
 import { useRecipes } from '../context/RecipesContext.jsx'
@@ -20,7 +20,11 @@ import {
 } from '../firebase/recipes.js'
 import { compressImage } from '../domain/image.js'
 import { DS, LORA, SYS } from '../styles/tokens.js'
-import { IconButton, LoadingState, MutedLabel, PrimaryBtn } from '../components/ui.jsx'
+import { LoadingState, MutedLabel, PageHeader, PrimaryBtn } from '../components/ui.jsx'
+
+function canGoBack() {
+  return typeof window !== 'undefined' && window.history.state?.idx > 0
+}
 
 export default function RecipeEdit() {
   const params = useParams()
@@ -33,6 +37,7 @@ export default function RecipeEdit() {
   const { books, loading: booksLoading } = useBooks()
   const { recipes, loading: recipesLoading } = useRecipes()
   const navigate = useNavigate()
+  const location = useLocation()
 
   const recipe = useMemo(
     () => (recipeId ? recipes.find(r => r.id === recipeId) : null),
@@ -118,7 +123,11 @@ export default function RecipeEdit() {
         await updateRecipe(targetId, { imagePath: path, imageUrl: url, updatedAt: new Date().toISOString() })
       }
 
-      navigate(`/recipes/${targetId}`, { replace: true })
+      if (!isNew && location.state?.from === 'recipe-details' && canGoBack()) {
+        navigate(-1)
+      } else {
+        navigate(`/recipes/${targetId}`, { replace: true })
+      }
     } catch (err) {
       setError(err.message || 'Kunde inte spara')
       setSubmitting(false)
@@ -126,21 +135,21 @@ export default function RecipeEdit() {
   }
 
   const currentImage = imagePreview || recipe?.imageUrl
+  const title = isNew ? 'Lägg till recept' : 'Redigera recept'
+
+  function returnToSource() {
+    if (!isNew && location.state?.from === 'recipe-details' && canGoBack()) {
+      navigate(-1)
+      return
+    }
+    navigate(isNew ? `/books/${book.id}` : `/recipes/${recipe.id}`, { replace: true })
+  }
 
   return (
     <div style={{ minHeight: '100vh', background: DS.gradientBg, color: DS.ink }}>
       <div style={{ maxWidth: 760, margin: '0 auto', padding: '18px 14px 32px' }}>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18, padding: '0 4px' }}>
-          <IconButton onClick={() => navigate(-1)} label="Tillbaka" size={30}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
-          </IconButton>
-          <div style={{ fontFamily: LORA, fontWeight: 600, fontSize: '1.05rem' }}>
-            {isNew ? 'Lägg till recept' : 'Redigera recept'}
-          </div>
-        </div>
+        <PageHeader title={title} onBack={returnToSource} />
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
@@ -245,7 +254,7 @@ export default function RecipeEdit() {
           )}
 
           <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-            <button type="button" onClick={() => navigate(-1)} style={cancelBtn}>
+            <button type="button" onClick={returnToSource} style={cancelBtn}>
               Avbryt
             </button>
             <PrimaryBtn type="submit">

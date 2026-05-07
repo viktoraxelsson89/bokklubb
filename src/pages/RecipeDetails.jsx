@@ -8,6 +8,10 @@ import { deleteRecipe, deleteRecipeImage } from '../firebase/recipes.js'
 import { DS, LORA, SYS } from '../styles/tokens.js'
 import { IconButton, LoadingState, MutedLabel, PrimaryBtn } from '../components/ui.jsx'
 
+function canGoBack() {
+  return typeof window !== 'undefined' && window.history.state?.idx > 0
+}
+
 export default function RecipeDetails() {
   const { recipeId } = useParams()
   const { userData } = useAuth()
@@ -26,6 +30,7 @@ export default function RecipeDetails() {
 
   const book = books.find(b => b.id === recipe.bookId)
   const canEdit = book ? canEditRecipe(book, userData) : false
+  const handleBack = () => canGoBack() ? navigate(-1) : navigate('/kokbok')
 
   async function handleDelete() {
     if (!confirm('Ta bort detta recept?')) return
@@ -60,7 +65,7 @@ export default function RecipeDetails() {
               alt={recipe.name}
               style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
             />
-            <IconButton onClick={() => navigate(-1)} label="Tillbaka" size={34} variant="dark" style={overlayBackBtn}>
+            <IconButton onClick={handleBack} label="Tillbaka" size={34} variant="dark" style={overlayBackBtn}>
               <BackArrow />
             </IconButton>
           </div>
@@ -70,7 +75,7 @@ export default function RecipeDetails() {
             padding: '14px 18px 24px',
             color: DS.bone,
           }}>
-            <IconButton onClick={() => navigate(-1)} label="Tillbaka" size={30} variant="dark" style={darkBackBtn}>
+            <IconButton onClick={handleBack} label="Tillbaka" size={30} variant="dark" style={darkBackBtn}>
               <BackArrow />
             </IconButton>
           </div>
@@ -139,7 +144,7 @@ export default function RecipeDetails() {
 
           {canEdit && (
             <div style={{ display: 'flex', gap: 10, marginTop: 12, flexWrap: 'wrap' }}>
-              <PrimaryBtn onClick={() => navigate(`/recipes/${recipe.id}/edit`)}>
+              <PrimaryBtn onClick={() => navigate(`/recipes/${recipe.id}/edit`, { state: { from: 'recipe-details' } })}>
                 Redigera
               </PrimaryBtn>
               <button onClick={handleDelete} disabled={deleting} style={dangerBtn}>

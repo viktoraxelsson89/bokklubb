@@ -19,6 +19,8 @@ export function Card({ children, style, onClick }) {
         transition: 'all 0.15s ease',
         cursor: onClick ? 'pointer' : 'default',
         transform: onClick && hovered ? 'translateY(-1px)' : 'none',
+        touchAction: onClick ? 'manipulation' : 'auto',
+        WebkitTapHighlightColor: 'transparent',
         ...style,
       }}
     >
@@ -191,12 +193,14 @@ export function PrimaryBtn({ children, onClick, small, type = 'button' }) {
       onClick={onClick}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => { setHov(false); setAct(false) }}
-      onMouseDown={() => setAct(true)}
-      onMouseUp={() => setAct(false)}
+      onPointerDown={() => setAct(true)}
+      onPointerUp={() => setAct(false)}
+      onPointerCancel={() => setAct(false)}
       style={{
         background: DS.sage, color: DS.ink,
         borderRadius: 20,
         padding: small ? '6px 14px' : '10px 20px',
+        minHeight: small ? 36 : 42,
         fontWeight: 600, fontFamily: 'inherit',
         fontSize: small ? '0.78rem' : '0.88rem',
         border: 'none', cursor: 'pointer',
@@ -204,6 +208,9 @@ export function PrimaryBtn({ children, onClick, small, type = 'button' }) {
         transition: 'all 0.15s ease',
         filter: hov ? 'brightness(1.05)' : 'none',
         transform: act ? 'scale(0.95)' : 'none',
+        touchAction: 'manipulation',
+        WebkitTapHighlightColor: 'transparent',
+        userSelect: 'none',
       }}
     >{children}</button>
   )
@@ -235,8 +242,9 @@ export function IconButton({
       title={title || label}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => { setHov(false); setAct(false) }}
-      onMouseDown={() => setAct(true)}
-      onMouseUp={() => setAct(false)}
+      onPointerDown={() => setAct(true)}
+      onPointerUp={() => setAct(false)}
+      onPointerCancel={() => setAct(false)}
       style={{
         width: size,
         height: size,
@@ -253,6 +261,9 @@ export function IconButton({
         outline: isDark ? 'none' : '1px solid rgba(156,153,143,0.2)',
         boxShadow: isDark ? 'none' : DS.shadowInset,
         transition: 'background 0.15s ease, transform 0.12s ease',
+        touchAction: 'manipulation',
+        WebkitTapHighlightColor: 'transparent',
+        userSelect: 'none',
         ...style,
         transform,
       }}
@@ -339,10 +350,13 @@ export function EmptyState({ title, text, actionLabel, onAction, icon }) {
         cursor: onAction ? 'pointer' : 'default',
         outline: '1.5px dashed rgba(186,209,150,0.55)',
         transition: 'transform 0.15s',
+        touchAction: onAction ? 'manipulation' : 'auto',
+        WebkitTapHighlightColor: 'transparent',
       }}
-      onMouseDown={e => { if (onAction) e.currentTarget.style.transform = 'scale(0.99)' }}
-      onMouseUp={e => { e.currentTarget.style.transform = 'none' }}
-      onMouseLeave={e => { e.currentTarget.style.transform = 'none' }}
+      onPointerDown={e => { if (onAction) e.currentTarget.style.transform = 'scale(0.99)' }}
+      onPointerUp={e => { e.currentTarget.style.transform = 'none' }}
+      onPointerCancel={e => { e.currentTarget.style.transform = 'none' }}
+      onPointerLeave={e => { e.currentTarget.style.transform = 'none' }}
     >
       {icon && (
         <div style={{
@@ -471,6 +485,7 @@ export function SortChips({ options, value, onChange }) {
         return (
           <button key={o.value} onClick={() => onChange(o.value)} style={{
             padding: '5px 12px', borderRadius: 20,
+            minHeight: 34,
             border: active ? 'none' : '1px solid rgba(156,153,143,0.25)',
             background: active ? DS.ink : 'rgba(255,255,255,0.6)',
             color: active ? DS.bone : DS.soft,
@@ -478,6 +493,9 @@ export function SortChips({ options, value, onChange }) {
             fontFamily: 'inherit', cursor: 'pointer',
             transition: 'all 0.15s ease',
             boxShadow: active ? DS.shadowInset : 'none',
+            touchAction: 'manipulation',
+            WebkitTapHighlightColor: 'transparent',
+            userSelect: 'none',
           }}>{o.label}</button>
         )
       })}
@@ -494,19 +512,23 @@ export function BookRow({ book, onClick, showSeason, rating }) {
       onClick={onClick}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => { setHov(false); setAct(false) }}
-      onMouseDown={() => setAct(true)}
-      onMouseUp={() => setAct(false)}
+      onPointerDown={() => setAct(true)}
+      onPointerUp={() => setAct(false)}
+      onPointerCancel={() => setAct(false)}
       style={{
         cursor: onClick ? 'pointer' : 'default',
         display: 'flex',
         alignItems: 'center',
         gap: 10,
         padding: '7px 12px 7px 7px',
+        minHeight: 44,
         borderRadius: 16,
         background: hov ? 'rgba(255,255,255,0.78)' : 'rgba(255,255,255,0.5)',
         outline: '1px solid rgba(156,153,143,0.15)',
         transition: 'all 0.12s ease',
         transform: act ? 'scale(0.99)' : 'none',
+        touchAction: onClick ? 'manipulation' : 'auto',
+        WebkitTapHighlightColor: 'transparent',
       }}
     >
       <CoverPlaceholder title={book.title} coverUrl={book.coverUrl} size="xs" />

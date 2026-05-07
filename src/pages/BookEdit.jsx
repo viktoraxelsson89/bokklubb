@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { useNavigate, useParams, Navigate } from 'react-router-dom'
+import { useLocation, useNavigate, useParams, Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useBooks } from '../context/BooksContext.jsx'
 import { updateBook } from '../firebase/books.js'
@@ -15,11 +15,16 @@ const PHASE_OPTIONS = [
   { value: BOOK_PHASES.FINALIZED,          label: 'Slutgiltig' },
 ]
 
+function canGoBack() {
+  return typeof window !== 'undefined' && window.history.state?.idx > 0
+}
+
 export default function BookEdit() {
   const { bookId } = useParams()
   const { userData } = useAuth()
   const { books, loading } = useBooks()
   const navigate = useNavigate()
+  const location = useLocation()
 
   const book = useMemo(() => books.find(b => b.id === bookId), [books, bookId])
   const initialForm = useMemo(() => (book ? buildFormFromBook(book) : null), [book])
@@ -49,18 +54,26 @@ export default function BookEdit() {
     try {
       const updates = buildBookUpdates(book, form)
       await updateBook(book.id, updates)
-      navigate(`/books/${book.id}`, { replace: true })
+      returnToBook()
     } catch (err) {
       setError(err.message || 'Kunde inte spara')
       setSubmitting(false)
     }
   }
 
+  function returnToBook() {
+    if (location.state?.from === 'book-details' && canGoBack()) {
+      navigate(-1)
+      return
+    }
+    navigate(`/books/${book.id}`, { replace: true })
+  }
+
   return (
     <div style={{ minHeight: '100vh', background: DS.gradientBg, color: DS.ink }}>
       <div style={{ maxWidth: 760, margin: '0 auto', padding: '18px 14px 32px' }}>
 
-        <PageHeader title="Redigera bok" onBack={() => navigate(`/books/${book.id}`, { replace: true })} />
+        <PageHeader title="Redigera bok" onBack={returnToBook} />
 
         <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
 
@@ -108,7 +121,7 @@ export default function BookEdit() {
           )}
 
           <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-            <button type="button" onClick={() => navigate(`/books/${book.id}`)} style={cancelBtn}>
+            <button type="button" onClick={returnToBook} style={cancelBtn}>
               Avbryt
             </button>
             <PrimaryBtn type="submit">{submitting ? 'Sparar…' : 'Spara'}</PrimaryBtn>
