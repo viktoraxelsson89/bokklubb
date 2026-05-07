@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { DS, LORA, SYS } from '../styles/tokens.js'
 import { MEMBERS } from '../domain/constants.js'
 
@@ -206,6 +206,89 @@ export function PrimaryBtn({ children, onClick, small, type = 'button' }) {
         transform: act ? 'scale(0.95)' : 'none',
       }}
     >{children}</button>
+  )
+}
+
+export function BottomSheet({ children, footer, onClose, title, contentStyle }) {
+  useEffect(() => {
+    const el = document.getElementById('main-scroll')
+    if (!el) return
+    const prev = el.style.overflow
+    el.style.overflow = 'hidden'
+    return () => { el.style.overflow = prev }
+  }, [])
+
+  useEffect(() => {
+    function handleKeyDown(e) {
+      if (e.key === 'Escape') onClose?.()
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [onClose])
+
+  return (
+    <>
+      <div
+        onClick={onClose}
+        style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(18,19,18,0.45)',
+          zIndex: 100,
+        }}
+      />
+      <section
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
+        style={{
+          position: 'fixed',
+          bottom: 'calc(62px + env(safe-area-inset-bottom))',
+          left: 0,
+          right: 0,
+          background: DS.bone,
+          borderRadius: '24px 24px 0 0',
+          zIndex: 101,
+          boxShadow: '0 -8px 32px rgba(18,19,18,0.16)',
+          maxHeight: 'calc(88dvh - 62px - env(safe-area-inset-bottom))',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'center', padding: '12px 0 4px', flexShrink: 0 }}>
+          <div style={{ width: 36, height: 4, borderRadius: 2, background: DS.dune }} />
+        </div>
+
+        <div style={{
+          overflowY: 'auto',
+          overscrollBehavior: 'contain',
+          WebkitOverflowScrolling: 'touch',
+          flex: 1,
+          padding: '12px 20px 0',
+          ...contentStyle,
+        }}>
+          {title && (
+            <div style={{ fontFamily: LORA, fontWeight: 600, fontSize: '1rem', color: DS.ink, marginBottom: 18 }}>
+              {title}
+            </div>
+          )}
+          {children}
+        </div>
+
+        {footer && (
+          <div style={{
+            flexShrink: 0,
+            padding: '16px 20px 20px',
+            background: DS.bone,
+            borderTop: '1px solid rgba(156,153,143,0.15)',
+            display: 'flex',
+            gap: 10,
+          }}>
+            {footer}
+          </div>
+        )}
+      </section>
+    </>
   )
 }
 

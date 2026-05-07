@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext.jsx'
 import { useSuggestions } from '../context/SuggestionsContext.jsx'
 import { addSuggestion, deleteSuggestion, updateSuggestion, subscribeToComments, addComment } from '../firebase/suggestions.js'
 import { coverHue, SUGGESTION_COMMENT_MAX, SUGGESTION_DESCRIPTION_MAX, SUGGESTION_REPLY_MAX } from '../domain/suggestions.js'
-import { Avatar } from '../components/ui.jsx'
+import { Avatar, BottomSheet } from '../components/ui.jsx'
 import { DS, LORA } from '../styles/tokens.js'
 
 export default function Suggestions() {
@@ -469,14 +469,6 @@ function SuggestionForm({ memberName, initial, onClose }) {
   const [description, setDescription] = useState(initial?.description ?? '')
   const [saving, setSaving] = useState(false)
 
-  useEffect(() => {
-    const el = document.getElementById('main-scroll')
-    if (!el) return
-    const prev = el.style.overflow
-    el.style.overflow = 'hidden'
-    return () => { el.style.overflow = prev }
-  }, [])
-
   async function handleSubmit(e) {
     e.preventDefault()
     if (!title.trim() || !author.trim()) return
@@ -504,38 +496,29 @@ function SuggestionForm({ memberName, initial, onClose }) {
   }
 
   return (
-    <>
-      <div
-        onClick={onClose}
-        style={{
-          position: 'fixed', inset: 0,
-          background: 'rgba(18,19,18,0.45)',
-          backdropFilter: 'blur(3px)',
-          zIndex: 100,
-        }}
-      />
-      <div style={{
-        position: 'fixed',
-        bottom: 'calc(62px + env(safe-area-inset-bottom))',
-        left: 0, right: 0,
-        background: DS.bone,
-        borderRadius: '24px 24px 0 0',
-        zIndex: 101,
-        boxShadow: '0 -8px 32px rgba(18,19,18,0.16)',
-        maxHeight: 'calc(88dvh - 62px - env(safe-area-inset-bottom))',
-        display: 'flex',
-        flexDirection: 'column',
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'center', padding: '12px 0 4px', flexShrink: 0 }}>
-          <div style={{ width: 36, height: 4, borderRadius: 2, background: DS.dune }} />
-        </div>
-
-        <div style={{ overflowY: 'auto', overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch', flex: 1, padding: '12px 20px 0' }}>
-          <div style={{ fontFamily: LORA, fontWeight: 600, fontSize: '1rem', color: DS.ink, marginBottom: 18 }}>
-            {isEdit ? 'Redigera tips' : 'Nytt boktips'}
-          </div>
-
-          <form id="suggestion-form" onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+    <BottomSheet
+      onClose={onClose}
+      title={isEdit ? 'Redigera tips' : 'Nytt boktips'}
+      footer={
+        <>
+          <button
+            type="submit"
+            form="suggestion-form"
+            disabled={saving || !title.trim() || !author.trim()}
+            style={{
+              ...primaryBtnStyle,
+              opacity: (!title.trim() || !author.trim()) ? 0.5 : 1,
+            }}
+          >
+            {saving ? (isEdit ? 'Sparar\u2026' : 'L\u00e4gger till\u2026') : (isEdit ? 'Spara' : 'L\u00e4gg till')}
+          </button>
+          <button type="button" onClick={onClose} style={ghostBtnStyle}>
+            Avbryt
+          </button>
+        </>
+      }
+    >
+      <form id="suggestion-form" onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             <FormField label="Titel *">
               <input
                 value={title}
@@ -588,34 +571,8 @@ function SuggestionForm({ memberName, initial, onClose }) {
 
             {/* spacer so last field isn't hidden behind sticky buttons */}
             <div style={{ height: 4 }} />
-          </form>
-        </div>
-
-        {/* Sticky button row always visible */}
-        <div style={{
-          flexShrink: 0,
-          padding: '16px 20px 20px',
-          background: DS.bone,
-          borderTop: '1px solid rgba(156,153,143,0.15)',
-          display: 'flex', gap: 10,
-        }}>
-          <button
-            type="submit"
-            form="suggestion-form"
-            disabled={saving || !title.trim() || !author.trim()}
-            style={{
-              ...primaryBtnStyle,
-              opacity: (!title.trim() || !author.trim()) ? 0.5 : 1,
-            }}
-          >
-            {saving ? (isEdit ? 'Sparar…' : 'Lägger till…') : (isEdit ? 'Spara' : 'Lägg till')}
-          </button>
-          <button type="button" onClick={onClose} style={ghostBtnStyle}>
-            Avbryt
-          </button>
-        </div>
-      </div>
-    </>
+      </form>
+    </BottomSheet>
   )
 }
 
