@@ -3,6 +3,61 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          const normalizedId = id.replace(/\\/g, '/')
+
+          if (!normalizedId.includes('/node_modules/')) return undefined
+
+          if (
+            normalizedId.includes('/node_modules/react/') ||
+            normalizedId.includes('/node_modules/react-dom/') ||
+            normalizedId.includes('/node_modules/react-router/') ||
+            normalizedId.includes('/node_modules/react-router-dom/') ||
+            normalizedId.includes('/node_modules/@remix-run/router/')
+          ) {
+            return 'react-vendor'
+          }
+
+          if (
+            normalizedId.includes('/node_modules/firebase/firestore') ||
+            normalizedId.includes('/node_modules/firebase/firebase-firestore') ||
+            normalizedId.includes('/node_modules/@firebase/firestore') ||
+            normalizedId.includes('/node_modules/@firebase/webchannel-wrapper')
+          ) {
+            return 'firebase-firestore'
+          }
+
+          if (
+            normalizedId.includes('/node_modules/firebase/auth') ||
+            normalizedId.includes('/node_modules/firebase/firebase-auth') ||
+            normalizedId.includes('/node_modules/@firebase/auth')
+          ) {
+            return 'firebase-auth'
+          }
+
+          if (
+            normalizedId.includes('/node_modules/firebase/storage') ||
+            normalizedId.includes('/node_modules/firebase/firebase-storage') ||
+            normalizedId.includes('/node_modules/@firebase/storage')
+          ) {
+            return 'firebase-storage'
+          }
+
+          if (
+            normalizedId.includes('/node_modules/firebase/') ||
+            normalizedId.includes('/node_modules/@firebase/')
+          ) {
+            return 'firebase-core'
+          }
+
+          return undefined
+        },
+      },
+    },
+  },
   plugins: [
     react(),
     VitePWA({
