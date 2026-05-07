@@ -13,6 +13,7 @@ import { DS, LORA, SYS } from '../styles/tokens.js'
 import {
   Avatar,
   CoverPlaceholder,
+  LoadingState,
   MutedLabel,
   PhasePill,
   PrimaryBtn,
@@ -38,11 +39,7 @@ export default function BookDetails() {
   useEffect(() => { document.getElementById('main-scroll')?.scrollTo(0, 0) }, [bookId])
 
   if (loading) {
-    return (
-      <div style={{ minHeight: '100vh', background: DS.gradientBg, padding: 24, color: DS.soft }}>
-        Laddar…
-      </div>
-    )
+    return <LoadingState text="Laddar..." />
   }
 
   const book = books.find(b => b.id === bookId)

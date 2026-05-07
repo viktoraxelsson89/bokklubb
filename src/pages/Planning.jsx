@@ -20,7 +20,7 @@ import {
   unlockRound,
 } from '../firebase/planning.js'
 import { DS, LORA } from '../styles/tokens.js'
-import { MutedLabel } from '../components/ui.jsx'
+import { LoadingState, MutedLabel } from '../components/ui.jsx'
 
 const RESPONSE_COLOR = {
   [RESPONSES.KAN]:      DS.sage,
@@ -41,11 +41,7 @@ export default function Planning() {
   const memberName = userData?.displayName
 
   if (loading) {
-    return (
-      <div style={{ minHeight: '100vh', background: DS.gradientBg, padding: 24, color: DS.ash }}>
-        Laddar…
-      </div>
-    )
+    return <LoadingState text="Laddar..." />
   }
 
   if (!round) return <NoRoundView isAdmin={isAdmin} memberName={memberName} />

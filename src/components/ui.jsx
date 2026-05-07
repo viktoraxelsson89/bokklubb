@@ -209,6 +209,70 @@ export function PrimaryBtn({ children, onClick, small, type = 'button' }) {
   )
 }
 
+export function LoadingState({ text = 'Laddar...' }) {
+  return (
+    <div style={{ minHeight: '100vh', background: DS.gradientBg, padding: 24, color: DS.soft }}>
+      {text}
+    </div>
+  )
+}
+
+export function EmptyState({ title, text, actionLabel, onAction, icon }) {
+  return (
+    <div
+      onClick={onAction}
+      style={{
+        marginTop: 8,
+        background: 'rgba(186,209,150,0.18)',
+        borderRadius: 24,
+        padding: '20px 18px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 14,
+        cursor: onAction ? 'pointer' : 'default',
+        outline: '1.5px dashed rgba(186,209,150,0.55)',
+        transition: 'transform 0.15s',
+      }}
+      onMouseDown={e => { if (onAction) e.currentTarget.style.transform = 'scale(0.99)' }}
+      onMouseUp={e => { e.currentTarget.style.transform = 'none' }}
+      onMouseLeave={e => { e.currentTarget.style.transform = 'none' }}
+    >
+      {icon && (
+        <div style={{
+          width: 52,
+          height: 52,
+          borderRadius: 14,
+          background: 'rgba(186,209,150,0.3)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '1.6rem',
+          flexShrink: 0,
+        }}>
+          {icon}
+        </div>
+      )}
+      <div>
+        {title && (
+          <div style={{ fontFamily: LORA, fontWeight: 600, fontSize: '1rem', color: DS.ink, marginBottom: 2 }}>
+            {title}
+          </div>
+        )}
+        {text && (
+          <div style={{ fontSize: '0.78rem', color: DS.soft }}>
+            {text}
+          </div>
+        )}
+        {actionLabel && (
+          <div style={{ fontSize: '0.72rem', color: DS.ash, marginTop: 6 }}>
+            {actionLabel}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export function BottomSheet({ children, footer, onClose, title, contentStyle }) {
   useEffect(() => {
     const el = document.getElementById('main-scroll')

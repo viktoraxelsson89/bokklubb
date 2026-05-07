@@ -18,7 +18,7 @@ import {
 } from '../firebase/photos.js'
 import { compressImage } from '../domain/image.js'
 import { DS, LORA, SYS } from '../styles/tokens.js'
-import { MutedLabel, CoverPlaceholder } from '../components/ui.jsx'
+import { MutedLabel, CoverPlaceholder, LoadingState } from '../components/ui.jsx'
 
 export default function Bilder() {
   const { userData } = useAuth()
@@ -35,11 +35,7 @@ export default function Bilder() {
   }, [])
 
   if (booksLoading || photosLoading) {
-    return (
-      <div style={{ minHeight: '100vh', background: DS.gradientBg, padding: 24, color: DS.soft }}>
-        Laddar bilder…
-      </div>
-    )
+    return <LoadingState text="Laddar bilder..." />
   }
 
   return (

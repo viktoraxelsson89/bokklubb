@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext.jsx'
 import { useSuggestions } from '../context/SuggestionsContext.jsx'
 import { addSuggestion, deleteSuggestion, updateSuggestion, subscribeToComments, addComment } from '../firebase/suggestions.js'
 import { coverHue, SUGGESTION_COMMENT_MAX, SUGGESTION_DESCRIPTION_MAX, SUGGESTION_REPLY_MAX } from '../domain/suggestions.js'
-import { Avatar, BottomSheet } from '../components/ui.jsx'
+import { Avatar, BottomSheet, EmptyState as UiEmptyState, LoadingState } from '../components/ui.jsx'
 import { DS, LORA } from '../styles/tokens.js'
 
 export default function Suggestions() {
@@ -19,11 +19,7 @@ export default function Suggestions() {
   }, [])
 
   if (loading) {
-    return (
-      <div style={{ minHeight: '100vh', background: DS.gradientBg, padding: 24, color: DS.ash }}>
-        Laddar…
-      </div>
-    )
+    return <LoadingState text="Laddar..." />
   }
 
   return (
@@ -40,7 +36,12 @@ export default function Suggestions() {
         </div>
 
         {suggestions.length === 0 ? (
-          <EmptyState onAdd={() => setShowForm(true)} />
+          <UiEmptyState
+            title="Lägg till ett boktips"
+            text="Föreslå nästa bok för klubben."
+            onAction={() => setShowForm(true)}
+            icon="B"
+          />
         ) : (
           <div style={{
             display: 'grid',
@@ -389,46 +390,6 @@ const SuggestionCard = memo(function SuggestionCard({ suggestion, memberName, is
     </div>
   )
 })
-
-// ─── Empty state ──────────────────────────────────────────────────────────────
-
-function EmptyState({ onAdd }) {
-  return (
-    <div
-      onClick={onAdd}
-      style={{
-        marginTop: 8,
-        background: 'rgba(186,209,150,0.18)',
-        borderRadius: 24,
-        padding: '20px 18px',
-        display: 'flex', alignItems: 'center', gap: 14,
-        cursor: 'pointer',
-        outline: '1.5px dashed rgba(186,209,150,0.55)',
-        transition: 'transform 0.15s',
-      }}
-      onMouseDown={e => { e.currentTarget.style.transform = 'scale(0.99)' }}
-      onMouseUp={e => { e.currentTarget.style.transform = 'none' }}
-      onMouseLeave={e => { e.currentTarget.style.transform = 'none' }}
-    >
-      <div style={{
-        width: 52, height: 52, borderRadius: 14,
-        background: 'rgba(186,209,150,0.3)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: '1.6rem', flexShrink: 0,
-      }}>
-        📚
-      </div>
-      <div>
-        <div style={{ fontFamily: LORA, fontWeight: 600, fontSize: '1rem', color: DS.ink, marginBottom: 2 }}>
-          Lägg till ett boktips
-        </div>
-        <div style={{ fontSize: '0.78rem', color: DS.soft }}>
-          Föreslå nästa bok för klubben.
-        </div>
-      </div>
-    </div>
-  )
-}
 
 // ─── FAB ──────────────────────────────────────────────────────────────────────
 

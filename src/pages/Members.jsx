@@ -4,7 +4,7 @@ import { useBooks } from '../context/BooksContext.jsx'
 import { MEMBERS } from '../domain/constants.js'
 import { getDisplayAverage } from '../domain/calculations.js'
 import { DS, LORA } from '../styles/tokens.js'
-import { Avatar, MutedLabel, RatingBadge } from '../components/ui.jsx'
+import { Avatar, LoadingState, MutedLabel, RatingBadge } from '../components/ui.jsx'
 
 function getMemberRating(book, memberName) {
   const finalVote = book.finalJudgments?.[memberName]?.vote
@@ -45,11 +45,7 @@ export default function Members() {
   }, [expanded])
 
   if (loading) {
-    return (
-      <div style={{ minHeight: '100vh', background: DS.gradientBg, padding: 24, color: DS.soft }}>
-        Laddar böcker…
-      </div>
-    )
+    return <LoadingState text="Laddar böcker..." />
   }
 
   const finalizedBooks = books.filter(b => b.phase === 'finalized')

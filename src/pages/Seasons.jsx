@@ -4,7 +4,7 @@ import { useBooks } from '../context/BooksContext.jsx'
 import { getAllSeasons, getBooksBySeason, getSeasonWinner } from '../domain/books.js'
 import { getDisplayAverage } from '../domain/calculations.js'
 import { DS, LORA } from '../styles/tokens.js'
-import { CoverPlaceholder, RatingBadge } from '../components/ui.jsx'
+import { CoverPlaceholder, LoadingState, RatingBadge } from '../components/ui.jsx'
 
 export default function Seasons() {
   const { books, loading } = useBooks()
@@ -19,11 +19,7 @@ export default function Seasons() {
   }, [open])
 
   if (loading) {
-    return (
-      <div style={{ minHeight: '100vh', background: DS.gradientBg, padding: 24, color: DS.soft }}>
-        Laddar böcker…
-      </div>
-    )
+    return <LoadingState text="Laddar böcker..." />
   }
 
   const finalizedBooks = books.filter(b => b.phase === 'finalized')

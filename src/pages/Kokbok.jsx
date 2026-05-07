@@ -9,7 +9,7 @@ import {
   getRecipesForKokbok,
 } from '../domain/recipes.js'
 import { DS, LORA, SYS } from '../styles/tokens.js'
-import { MutedLabel } from '../components/ui.jsx'
+import { LoadingState, MutedLabel } from '../components/ui.jsx'
 
 export default function Kokbok() {
   const { books, loading: booksLoading } = useBooks()
@@ -26,11 +26,7 @@ export default function Kokbok() {
   )
 
   if (booksLoading || recipesLoading) {
-    return (
-      <div style={{ minHeight: '100vh', background: DS.gradientBg, padding: 24, color: DS.soft }}>
-        Laddar recept…
-      </div>
-    )
+    return <LoadingState text="Laddar recept..." />
   }
 
   return (

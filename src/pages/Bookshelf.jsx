@@ -10,6 +10,7 @@ import { DS, LORA } from '../styles/tokens.js'
 import {
   BookRow,
   CoverPlaceholder,
+  LoadingState,
   MutedLabel,
   PhasePill,
   RatingBadge,
@@ -53,11 +54,7 @@ export default function Bookshelf() {
     hasUnansweredDates(round.responses || {}, round.proposedDates || [], memberName)
 
   if (loading) {
-    return (
-      <div style={{ minHeight: '100vh', background: DS.gradientBg, padding: 24, color: DS.soft }}>
-        Laddar böcker…
-      </div>
-    )
+    return <LoadingState text="Laddar böcker..." />
   }
 
   const finalizedBooks = books.filter(b => b.phase === 'finalized')

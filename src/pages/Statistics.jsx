@@ -15,7 +15,7 @@ import {
   getControversyRanking,
 } from '../domain/statistics.js'
 import { DS, LORA } from '../styles/tokens.js'
-import { Avatar, MutedLabel } from '../components/ui.jsx'
+import { Avatar, LoadingState, MutedLabel } from '../components/ui.jsx'
 
 const TABS = [
   { id: 'records', label: 'Rekord' },
@@ -35,11 +35,7 @@ export default function Statistics() {
   )
 
   if (loading) {
-    return (
-      <div style={{ minHeight: '100vh', background: DS.gradientBg, padding: 24, color: DS.soft }}>
-        Laddar statistik…
-      </div>
-    )
+    return <LoadingState text="Laddar statistik..." />
   }
 
   return (
