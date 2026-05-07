@@ -238,7 +238,6 @@ export function IconButton({
       onMouseDown={() => setAct(true)}
       onMouseUp={() => setAct(false)}
       style={{
-        ...style,
         width: size,
         height: size,
         borderRadius: round ? '50%' : 10,
@@ -254,6 +253,7 @@ export function IconButton({
         outline: isDark ? 'none' : '1px solid rgba(156,153,143,0.2)',
         boxShadow: isDark ? 'none' : DS.shadowInset,
         transition: 'background 0.15s ease, transform 0.12s ease',
+        ...style,
         transform,
       }}
     >

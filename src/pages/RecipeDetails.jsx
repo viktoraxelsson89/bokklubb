@@ -6,7 +6,7 @@ import { useRecipes } from '../context/RecipesContext.jsx'
 import { canEditRecipe } from '../domain/recipes.js'
 import { deleteRecipe, deleteRecipeImage } from '../firebase/recipes.js'
 import { DS, LORA, SYS } from '../styles/tokens.js'
-import { MutedLabel, PrimaryBtn } from '../components/ui.jsx'
+import { IconButton, MutedLabel, PrimaryBtn } from '../components/ui.jsx'
 
 export default function RecipeDetails() {
   const { recipeId } = useParams()
@@ -60,9 +60,9 @@ export default function RecipeDetails() {
               alt={recipe.name}
               style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
             />
-            <button onClick={() => navigate(-1)} style={overlayBackBtn}>
-              <BackArrow color="#fff" />
-            </button>
+            <IconButton onClick={() => navigate(-1)} label="Tillbaka" size={34} variant="dark" style={overlayBackBtn}>
+              <BackArrow />
+            </IconButton>
           </div>
         ) : (
           <div style={{
@@ -70,9 +70,9 @@ export default function RecipeDetails() {
             padding: '14px 18px 24px',
             color: DS.bone,
           }}>
-            <button onClick={() => navigate(-1)} style={darkBackBtn}>
-              <BackArrow color="rgba(244,243,241,0.7)" />
-            </button>
+            <IconButton onClick={() => navigate(-1)} label="Tillbaka" size={30} variant="dark" style={darkBackBtn}>
+              <BackArrow />
+            </IconButton>
           </div>
         )}
 
@@ -196,9 +196,9 @@ function Shell({ children }) {
   )
 }
 
-function BackArrow({ color }) {
+function BackArrow() {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
       <polyline points="15 18 9 12 15 6" />
     </svg>
   )
@@ -221,16 +221,16 @@ const textBlock = {
 
 const overlayBackBtn = {
   position: 'absolute', top: 12, left: 12,
-  background: 'rgba(18,19,18,0.5)', border: 'none', cursor: 'pointer',
-  borderRadius: 10, width: 34, height: 34,
-  display: 'flex', alignItems: 'center', justifyContent: 'center',
+  background: 'rgba(18,19,18,0.5)',
+  border: 'none',
+  color: '#fff',
   backdropFilter: 'blur(4px)',
 }
 
 const darkBackBtn = {
-  background: 'rgba(244,243,241,0.1)', border: 'none', cursor: 'pointer',
-  borderRadius: 10, width: 30, height: 30,
-  display: 'flex', alignItems: 'center', justifyContent: 'center',
+  background: 'rgba(244,243,241,0.1)',
+  border: 'none',
+  color: 'rgba(244,243,241,0.7)',
 }
 
 const dangerBtn = {

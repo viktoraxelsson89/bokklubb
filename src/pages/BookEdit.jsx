@@ -6,7 +6,7 @@ import { updateBook } from '../firebase/books.js'
 import { buildBookUpdates, buildFormFromBook } from '../domain/bookEdit.js'
 import { BOOK_PHASES, MEMBERS, COMMENT_MAX_LENGTH } from '../domain/constants.js'
 import { DS, LORA } from '../styles/tokens.js'
-import { Avatar, MutedLabel, PrimaryBtn } from '../components/ui.jsx'
+import { Avatar, IconButton, MutedLabel, PrimaryBtn } from '../components/ui.jsx'
 
 const PHASE_OPTIONS = [
   { value: BOOK_PHASES.PRELIMINARY_VOTING, label: 'Förhandsröstning' },
@@ -61,11 +61,11 @@ export default function BookEdit() {
       <div style={{ maxWidth: 760, margin: '0 auto', padding: '18px 14px 32px' }}>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18, padding: '0 4px' }}>
-          <button onClick={() => navigate(`/books/${book.id}`)} style={backBtn}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={DS.soft} strokeWidth="2.5" strokeLinecap="round">
+          <IconButton onClick={() => navigate(`/books/${book.id}`)} label="Tillbaka" size={30}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
               <polyline points="15 18 9 12 15 6" />
             </svg>
-          </button>
+          </IconButton>
           <div style={{ fontFamily: LORA, fontWeight: 600, fontSize: '1.05rem' }}>Redigera bok</div>
         </div>
 
@@ -257,13 +257,6 @@ const inputStyle = {
   borderRadius: 10,
   padding: '8px 10px',
   outline: 'none',
-}
-
-const backBtn = {
-  background: 'rgba(255,255,255,0.6)', border: 'none', cursor: 'pointer',
-  borderRadius: 10, width: 30, height: 30,
-  display: 'flex', alignItems: 'center', justifyContent: 'center',
-  outline: '1px solid rgba(156,153,143,0.2)',
 }
 
 const cancelBtn = {

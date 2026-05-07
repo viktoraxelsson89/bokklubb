@@ -18,7 +18,7 @@ import {
 } from '../firebase/photos.js'
 import { compressImage } from '../domain/image.js'
 import { DS, LORA, SYS } from '../styles/tokens.js'
-import { MutedLabel, CoverPlaceholder, IconButton, LoadingState } from '../components/ui.jsx'
+import { MutedLabel, CoverPlaceholder, EmptyState, IconButton, LoadingState } from '../components/ui.jsx'
 
 export default function Bilder() {
   const { userData } = useAuth()
@@ -51,7 +51,7 @@ export default function Bilder() {
         </div>
 
         {books.length === 0 ? (
-          <EmptyState text="Lägg till en bok först." />
+          <EmptyState title="Inga bilder" text="Lägg till en bok först." />
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
             {books.length > 0 && groups.length === 0 && (
@@ -314,7 +314,7 @@ function BooksWithoutPhotos({ books, groups, userData, uploadState, setUploadSta
 
 function UploadableEmptyBooks({ books, userData, uploadState, setUploadState }) {
   if (!canUploadPhotos(userData)) {
-    return <EmptyState text="Inga bilder uppladdade än." />
+    return <EmptyState title="Inga bilder" text="Inga bilder uppladdade än." />
   }
   const sorted = [...books].sort((a, b) => {
     const sA = a.season ?? 0, sB = b.season ?? 0
@@ -367,20 +367,6 @@ function EmptyBookRow({ book, uploadState, onUpload }) {
         {uploadState && <UploadStatus state={uploadState} />}
       </div>
       <UploadButton onUpload={onUpload} label="+" />
-    </div>
-  )
-}
-
-function EmptyState({ text }) {
-  return (
-    <div style={{
-      padding: 32, textAlign: 'center', color: DS.ash,
-      background: 'rgba(255,255,255,0.5)',
-      borderRadius: 18,
-      outline: '1px solid rgba(156,153,143,0.15)',
-    }}>
-      <div style={{ marginBottom: 6 }}><MutedLabel>Inga bilder</MutedLabel></div>
-      <div style={{ fontSize: '0.85rem', color: DS.soft }}>{text}</div>
     </div>
   )
 }

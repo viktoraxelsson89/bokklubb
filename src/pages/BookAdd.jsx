@@ -6,7 +6,7 @@ import { addBook, setCurrentBook } from '../firebase/books.js'
 import { buildNewBookDoc, validateNewBookForm } from '../domain/bookCreate.js'
 import { MEMBERS } from '../domain/constants.js'
 import { DS, LORA } from '../styles/tokens.js'
-import { CoverPlaceholder, MutedLabel, PrimaryBtn } from '../components/ui.jsx'
+import { CoverPlaceholder, IconButton, MutedLabel, PrimaryBtn } from '../components/ui.jsx'
 
 export default function BookAdd() {
   const { userData } = useAuth()
@@ -62,11 +62,11 @@ export default function BookAdd() {
       <div style={{ maxWidth: 760, margin: '0 auto', padding: '18px 14px 32px' }}>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18, padding: '0 4px' }}>
-          <button onClick={() => navigate(-1)} style={backBtn} title="Tillbaka">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={DS.soft} strokeWidth="2.5" strokeLinecap="round">
+          <IconButton onClick={() => navigate(-1)} label="Tillbaka" size={30}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
               <polyline points="15 18 9 12 15 6" />
             </svg>
-          </button>
+          </IconButton>
           <div style={{ fontFamily: LORA, fontWeight: 600, fontSize: '1.05rem' }}>Ny bok</div>
         </div>
 
@@ -206,13 +206,6 @@ const inputStyle = {
   borderRadius: 10,
   padding: '8px 10px',
   outline: 'none',
-}
-
-const backBtn = {
-  background: 'rgba(255,255,255,0.6)', border: 'none', cursor: 'pointer',
-  borderRadius: 10, width: 30, height: 30,
-  display: 'flex', alignItems: 'center', justifyContent: 'center',
-  outline: '1px solid rgba(156,153,143,0.2)',
 }
 
 const cancelBtn = {
