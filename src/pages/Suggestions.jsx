@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useSuggestions } from '../context/SuggestionsContext.jsx'
 import { addSuggestion, deleteSuggestion, updateSuggestion, subscribeToComments, addComment } from '../firebase/suggestions.js'
@@ -11,7 +11,12 @@ export default function Suggestions() {
   const { suggestions, loading } = useSuggestions()
   const [showForm, setShowForm] = useState(false)
   const [editingSuggestion, setEditingSuggestion] = useState(null)
+  const [flippedSuggestionId, setFlippedSuggestionId] = useState(null)
   const memberName = userData?.displayName
+
+  const handleToggleSuggestion = useCallback((id) => {
+    setFlippedSuggestionId(current => current === id ? null : id)
+  }, [])
 
   if (loading) {
     return (
@@ -48,7 +53,9 @@ export default function Suggestions() {
                 suggestion={s}
                 memberName={memberName}
                 isOwn={s.suggestedBy === memberName}
-                onEdit={() => setEditingSuggestion(s)}
+                flipped={flippedSuggestionId === s.id}
+                onFlip={handleToggleSuggestion}
+                onEdit={setEditingSuggestion}
               />
             ))}
           </div>
@@ -76,15 +83,14 @@ export default function Suggestions() {
 
 // ─── Card ─────────────────────────────────────────────────────────────────────
 
-function SuggestionCard({ suggestion, memberName, isOwn, onEdit }) {
+const SuggestionCard = memo(function SuggestionCard({ suggestion, memberName, isOwn, flipped, onFlip, onEdit }) {
   const [deleting, setDeleting] = useState(false)
-  const [flipped, setFlipped] = useState(false)
   const [comments, setComments] = useState([])
   const [replyText, setReplyText] = useState('')
   const [sending, setSending] = useState(false)
   const commentsEndRef = useRef(null)
   const didScrollRef = useRef(false)
-  const hue = coverHue(suggestion.title)
+  const hue = useMemo(() => coverHue(suggestion.title), [suggestion.title])
   const hasDescription = !!suggestion.description
 
   useEffect(() => {
@@ -116,19 +122,21 @@ function SuggestionCard({ suggestion, memberName, isOwn, onEdit }) {
 
   function handleEdit(e) {
     e.stopPropagation()
-    onEdit()
+    onEdit(suggestion)
   }
 
   return (
     <div
       onClick={() => {
         if (didScrollRef.current) { didScrollRef.current = false; return }
-        setFlipped(f => !f)
+        onFlip(suggestion.id)
       }}
       style={{
         perspective: 900,
         cursor: 'pointer',
         height: '100%',
+        contentVisibility: 'auto',
+        containIntrinsicSize: '360px 520px',
       }}
     >
       {/* Rotating inner */}
@@ -159,6 +167,8 @@ function SuggestionCard({ suggestion, memberName, isOwn, onEdit }) {
               <img
                 src={suggestion.coverUrl}
                 alt={suggestion.title}
+                loading="lazy"
+                decoding="async"
                 style={{
                   position: 'absolute', inset: 0,
                   width: '100%', height: '100%',
@@ -198,7 +208,6 @@ function SuggestionCard({ suggestion, memberName, isOwn, onEdit }) {
                     position: 'absolute', top: 7, left: 7,
                     width: 26, height: 26, borderRadius: '50%',
                     background: 'rgba(18,19,18,0.55)',
-                    backdropFilter: 'blur(6px)',
                     border: 'none', cursor: 'pointer',
                     color: 'rgba(244,243,241,0.9)',
                     fontSize: '0.75rem', lineHeight: 1,
@@ -214,7 +223,6 @@ function SuggestionCard({ suggestion, memberName, isOwn, onEdit }) {
                     position: 'absolute', top: 7, right: 7,
                     width: 26, height: 26, borderRadius: '50%',
                     background: 'rgba(18,19,18,0.55)',
-                    backdropFilter: 'blur(6px)',
                     border: 'none', cursor: deleting ? 'default' : 'pointer',
                     color: 'rgba(244,243,241,0.9)',
                     fontSize: '1rem', lineHeight: 1,
@@ -232,7 +240,6 @@ function SuggestionCard({ suggestion, memberName, isOwn, onEdit }) {
               <div style={{
                 position: 'absolute', bottom: 7, right: 7,
                 background: 'rgba(18,19,18,0.5)',
-                backdropFilter: 'blur(6px)',
                 borderRadius: 6,
                 padding: '2px 6px',
                 fontSize: '0.58rem',
@@ -381,7 +388,7 @@ function SuggestionCard({ suggestion, memberName, isOwn, onEdit }) {
       </div>
     </div>
   )
-}
+})
 
 // ─── Empty state ──────────────────────────────────────────────────────────────
 
