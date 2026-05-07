@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useBooks } from '../context/BooksContext.jsx'
@@ -10,6 +10,7 @@ import { getRecipesForBook, canAddRecipe, bookHasLegacyRecipe } from '../domain/
 import { getDisplayAverage } from '../domain/calculations.js'
 import { BOOK_PHASES, MEMBERS, COMMENT_MAX_LENGTH } from '../domain/constants.js'
 import { DS, LORA, SYS } from '../styles/tokens.js'
+import { useMainScrollTop } from '../components/scroll.js'
 import {
   Avatar,
   CoverPlaceholder,
@@ -32,7 +33,7 @@ export default function BookDetails() {
   const { userData } = useAuth()
   const { books, loading } = useBooks()
   const navigate = useNavigate()
-  useEffect(() => { document.getElementById('main-scroll')?.scrollTo(0, 0) }, [bookId])
+  useMainScrollTop(bookId)
 
   if (loading) {
     return <LoadingState text="Laddar..." />

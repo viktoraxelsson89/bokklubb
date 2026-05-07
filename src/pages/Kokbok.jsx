@@ -9,7 +9,10 @@ import {
   getRecipesForKokbok,
 } from '../domain/recipes.js'
 import { DS, LORA, SYS } from '../styles/tokens.js'
+import { saveMainScrollPosition, useRestoreMainScroll } from '../components/scroll.js'
 import { LoadingState, MutedLabel } from '../components/ui.jsx'
+
+const KOKBOK_SCROLL_KEY = 'kokbok_scroll'
 
 export default function Kokbok() {
   const { books, loading: booksLoading } = useBooks()
@@ -17,6 +20,7 @@ export default function Kokbok() {
   const [season, setSeason] = useState(() => sessionStorage.getItem('kokbok_season') ?? 'all')
   useEffect(() => { sessionStorage.setItem('kokbok_season', season) }, [season])
   const navigate = useNavigate()
+  useRestoreMainScroll(KOKBOK_SCROLL_KEY, !(booksLoading || recipesLoading))
 
   const merged = useMemo(() => getRecipesForKokbok(recipes, books), [recipes, books])
   const seasons = useMemo(() => getAllRecipeSeasons(merged, books), [merged, books])
@@ -24,6 +28,10 @@ export default function Kokbok() {
     () => filterRecipesBySeason(merged, books, season).map(r => enrichRecipe(r, books)),
     [merged, books, season],
   )
+  const navigateToRecipe = (recipe) => {
+    saveMainScrollPosition(KOKBOK_SCROLL_KEY)
+    navigate(recipe.legacy ? `/books/${recipe.bookId}` : `/recipes/${recipe.id}`)
+  }
 
   if (booksLoading || recipesLoading) {
     return <LoadingState text="Laddar recept..." />
@@ -57,9 +65,7 @@ export default function Kokbok() {
               <RecipeCard
                 key={recipe.id}
                 recipe={recipe}
-                onClick={() => navigate(
-                  recipe.legacy ? `/books/${recipe.bookId}` : `/recipes/${recipe.id}`
-                )}
+                onClick={() => navigateToRecipe(recipe)}
               />
             ))}
           </div>

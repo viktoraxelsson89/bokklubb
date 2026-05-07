@@ -6,6 +6,7 @@ import { useRecipes } from '../context/RecipesContext.jsx'
 import { canEditRecipe } from '../domain/recipes.js'
 import { deleteRecipe, deleteRecipeImage } from '../firebase/recipes.js'
 import { DS, LORA, SYS } from '../styles/tokens.js'
+import { useMainScrollTop } from '../components/scroll.js'
 import { IconButton, LoadingState, MutedLabel, PrimaryBtn } from '../components/ui.jsx'
 
 function canGoBack() {
@@ -20,6 +21,7 @@ export default function RecipeDetails() {
   const navigate = useNavigate()
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState('')
+  useMainScrollTop(recipeId)
 
   if (booksLoading || recipesLoading) {
     return <LoadingState text="Laddar recept..." />

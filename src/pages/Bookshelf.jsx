@@ -7,6 +7,7 @@ import { hasUnansweredDates, formatDateSv } from '../domain/planning.js'
 import { getAllSeasons, getBooksBySeason } from '../domain/books.js'
 import { getDisplayAverage } from '../domain/calculations.js'
 import { DS, LORA } from '../styles/tokens.js'
+import { saveMainScrollPosition, useRestoreMainScroll } from '../components/scroll.js'
 import {
   BookRow,
   CoverPlaceholder,
@@ -27,6 +28,8 @@ const SORT_OPTIONS = [
   { value: 'recent', label: 'Senast läst' },
 ]
 
+const BOOKSHELF_SCROLL_KEY = 'bookshelf_scroll'
+
 function sortFinalized(books, sortBy) {
   const sorted = [...books]
   if (sortBy === 'title')  return sorted.sort((a, b) => a.title.localeCompare(b.title, 'sv'))
@@ -46,6 +49,7 @@ export default function Bookshelf() {
   const navigate = useNavigate()
   const [sortBy, setSortBy] = useState(() => sessionStorage.getItem('bookshelf_sortby') ?? 'season')
   useEffect(() => { sessionStorage.setItem('bookshelf_sortby', sortBy) }, [sortBy])
+  useRestoreMainScroll(BOOKSHELF_SCROLL_KEY, !loading)
 
   const memberName = userData?.displayName
   const planningActive = round && round.status === 'active'
@@ -62,6 +66,10 @@ export default function Bookshelf() {
   const finalsSubmitted = currentBook
     ? Object.values(currentBook.finalJudgments || {}).filter(v => v?.submitted).length
     : 0
+  const navigateToBook = (bookId) => {
+    saveMainScrollPosition(BOOKSHELF_SCROLL_KEY)
+    navigate(`/books/${bookId}`)
+  }
 
   return (
     <div style={{ minHeight: '100vh', background: DS.gradientBg, color: DS.ink }}>
@@ -141,7 +149,7 @@ export default function Bookshelf() {
             <div style={{ marginBottom: 20 }}>
               <MutedLabel>Pågående</MutedLabel>
               <div
-                onClick={() => navigate(`/books/${currentBook.id}`)}
+                onClick={() => navigateToBook(currentBook.id)}
                 style={{
                   marginTop: 8,
                   background: 'rgba(201,192,148,0.28)',
@@ -288,7 +296,7 @@ export default function Bookshelf() {
                         key={book.id}
                         book={book}
                         rating={getDisplayAverage(book)}
-                        onClick={() => navigate(`/books/${book.id}`)}
+                        onClick={() => navigateToBook(book.id)}
                       />
                     ))}
                   </div>
@@ -303,7 +311,7 @@ export default function Bookshelf() {
                   book={book}
                   rating={getDisplayAverage(book)}
                   showSeason
-                  onClick={() => navigate(`/books/${book.id}`)}
+                  onClick={() => navigateToBook(book.id)}
                 />
               ))}
             </div>
