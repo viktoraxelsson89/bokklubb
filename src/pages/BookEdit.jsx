@@ -6,7 +6,7 @@ import { updateBook } from '../firebase/books.js'
 import { buildBookUpdates, buildFormFromBook } from '../domain/bookEdit.js'
 import { BOOK_PHASES, MEMBERS, COMMENT_MAX_LENGTH } from '../domain/constants.js'
 import { DS, LORA } from '../styles/tokens.js'
-import { Avatar, IconButton, MutedLabel, PrimaryBtn } from '../components/ui.jsx'
+import { Avatar, IconButton, LoadingState, MutedLabel, PrimaryBtn } from '../components/ui.jsx'
 
 const PHASE_OPTIONS = [
   { value: BOOK_PHASES.PRELIMINARY_VOTING, label: 'Förhandsröstning' },
@@ -27,10 +27,10 @@ export default function BookEdit() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
 
-  if (loading) return <PageShell>Laddar…</PageShell>
+  if (loading) return <LoadingState text="Laddar..." />
   if (userData && userData.role !== 'admin') return <Navigate to={`/books/${bookId}`} replace />
   if (!book) return <PageShell>Boken hittades inte.</PageShell>
-  if (!form) return <PageShell>Laddar…</PageShell>
+  if (!form) return <LoadingState text="Laddar..." />
 
   function setField(key, value) {
     setForm(f => ({ ...f, [key]: value }))

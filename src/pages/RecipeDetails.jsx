@@ -6,7 +6,7 @@ import { useRecipes } from '../context/RecipesContext.jsx'
 import { canEditRecipe } from '../domain/recipes.js'
 import { deleteRecipe, deleteRecipeImage } from '../firebase/recipes.js'
 import { DS, LORA, SYS } from '../styles/tokens.js'
-import { IconButton, MutedLabel, PrimaryBtn } from '../components/ui.jsx'
+import { IconButton, LoadingState, MutedLabel, PrimaryBtn } from '../components/ui.jsx'
 
 export default function RecipeDetails() {
   const { recipeId } = useParams()
@@ -18,7 +18,7 @@ export default function RecipeDetails() {
   const [error, setError] = useState('')
 
   if (booksLoading || recipesLoading) {
-    return <Shell>Laddar…</Shell>
+    return <LoadingState text="Laddar recept..." />
   }
 
   const recipe = recipes.find(r => r.id === recipeId)

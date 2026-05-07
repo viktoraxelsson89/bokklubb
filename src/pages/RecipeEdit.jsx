@@ -20,7 +20,7 @@ import {
 } from '../firebase/recipes.js'
 import { compressImage } from '../domain/image.js'
 import { DS, LORA, SYS } from '../styles/tokens.js'
-import { IconButton, MutedLabel, PrimaryBtn } from '../components/ui.jsx'
+import { IconButton, LoadingState, MutedLabel, PrimaryBtn } from '../components/ui.jsx'
 
 export default function RecipeEdit() {
   const params = useParams()
@@ -60,7 +60,7 @@ export default function RecipeEdit() {
     }
   }, [wantsLegacyPrefill, book, imagePreview])
 
-  if (booksLoading || recipesLoading) return <Shell>Laddar…</Shell>
+  if (booksLoading || recipesLoading) return <LoadingState text="Laddar recept..." />
   if (!isNew && !recipe) return <Shell>Receptet hittades inte.</Shell>
   if (!book) return <Shell>Boken hittades inte.</Shell>
 
