@@ -41,7 +41,13 @@ export default function BottomNav() {
       {merOpen && (
         <div
           onClick={() => setMerOpen(false)}
-          style={{ position: 'fixed', inset: 0, zIndex: 90 }}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 90,
+            touchAction: 'manipulation',
+            WebkitTapHighlightColor: 'transparent',
+          }}
         />
       )}
 
@@ -52,6 +58,10 @@ export default function BottomNav() {
         paddingBottom: 'env(safe-area-inset-bottom)',
         position: 'relative',
         zIndex: 92,
+        touchAction: 'manipulation',
+        WebkitTapHighlightColor: 'transparent',
+        userSelect: 'none',
+        WebkitUserSelect: 'none',
       }}>
         {merOpen && (
           <div style={{
@@ -65,21 +75,12 @@ export default function BottomNav() {
             minWidth: 148,
           }}>
             {MER_ITEMS.map(item => (
-              <button
+              <MerItemButton
                 key={item.id}
+                label={item.label}
+                icon={iconFor(item.id, false)}
                 onClick={() => handleMerItemClick(item.to)}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 10,
-                  width: '100%', padding: '11px 18px',
-                  background: 'none', border: 'none', cursor: 'pointer',
-                  color: 'rgba(244,243,241,0.85)',
-                  fontSize: '0.82rem', fontFamily: 'inherit',
-                  textAlign: 'left',
-                }}
-              >
-                {iconFor(item.id, false)}
-                {item.label}
-              </button>
+              />
             ))}
           </div>
         )}
@@ -102,26 +103,40 @@ export default function BottomNav() {
 }
 
 function NavBtn({ label, icon, active, onClick }) {
+  const [pressed, setPressed] = useState(false)
+
   return (
     <button
       onClick={onClick}
+      onPointerDown={() => setPressed(true)}
+      onPointerUp={() => setPressed(false)}
+      onPointerCancel={() => setPressed(false)}
+      onPointerLeave={() => setPressed(false)}
+      onBlur={() => setPressed(false)}
       style={{
         flex: 1, display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center', gap: 3,
         background: 'none', border: 'none', cursor: 'pointer',
-        padding: '8px 0',
+        padding: '8px 2px',
         minHeight: 62,
         fontFamily: 'inherit',
-        transition: 'opacity 0.15s',
+        transition: 'background 0.12s ease, transform 0.12s ease',
         minWidth: 0,
+        touchAction: 'manipulation',
+        WebkitTapHighlightColor: 'transparent',
+        userSelect: 'none',
+        WebkitUserSelect: 'none',
+        transform: pressed ? 'scale(0.96)' : 'none',
       }}
     >
       <div style={{
         width: 34, height: 26, borderRadius: 8,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: active ? 'rgba(186,209,150,0.15)' : 'transparent',
+        background: pressed
+          ? 'rgba(244,243,241,0.1)'
+          : active ? 'rgba(186,209,150,0.15)' : 'transparent',
         border: active ? '1px solid rgba(186,209,150,0.3)' : '1px solid transparent',
-        transition: 'all 0.2s',
+        transition: 'background 0.12s ease, border-color 0.15s ease',
       }}>
         {icon}
       </div>
@@ -132,6 +147,45 @@ function NavBtn({ label, icon, active, onClick }) {
         whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
         maxWidth: '100%', padding: '0 2px',
       }}>{label}</span>
+    </button>
+  )
+}
+
+function MerItemButton({ label, icon, onClick }) {
+  const [pressed, setPressed] = useState(false)
+
+  return (
+    <button
+      onClick={onClick}
+      onPointerDown={() => setPressed(true)}
+      onPointerUp={() => setPressed(false)}
+      onPointerCancel={() => setPressed(false)}
+      onPointerLeave={() => setPressed(false)}
+      onBlur={() => setPressed(false)}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 10,
+        width: '100%',
+        minHeight: 44,
+        padding: '11px 18px',
+        background: pressed ? 'rgba(244,243,241,0.08)' : 'none',
+        border: 'none',
+        cursor: 'pointer',
+        color: 'rgba(244,243,241,0.85)',
+        fontSize: '0.82rem',
+        fontFamily: 'inherit',
+        textAlign: 'left',
+        transition: 'background 0.12s ease, transform 0.12s ease',
+        transform: pressed ? 'scale(0.98)' : 'none',
+        touchAction: 'manipulation',
+        WebkitTapHighlightColor: 'transparent',
+        userSelect: 'none',
+        WebkitUserSelect: 'none',
+      }}
+    >
+      {icon}
+      {label}
     </button>
   )
 }
