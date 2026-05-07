@@ -18,7 +18,7 @@ import {
 } from '../firebase/photos.js'
 import { compressImage } from '../domain/image.js'
 import { DS, LORA, SYS } from '../styles/tokens.js'
-import { MutedLabel, CoverPlaceholder, LoadingState } from '../components/ui.jsx'
+import { MutedLabel, CoverPlaceholder, IconButton, LoadingState } from '../components/ui.jsx'
 
 export default function Bilder() {
   const { userData } = useAuth()
@@ -441,25 +441,46 @@ function Lightbox({ group, photoIndex, userData, onClose, onChange, onDeleted })
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}
     >
-      <button onClick={(e) => { e.stopPropagation(); onClose() }} style={iconBtnStyle('top-right')} aria-label="Stäng">
+      <IconButton
+        onClick={(e) => { e.stopPropagation(); onClose() }}
+        style={iconBtnStyle('top-right')}
+        label="Stäng"
+        size={44}
+        variant="dark"
+        round
+      >
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
           <line x1="6" y1="6" x2="18" y2="18" />
           <line x1="18" y1="6" x2="6" y2="18" />
         </svg>
-      </button>
+      </IconButton>
 
       {total > 1 && (
         <>
-          <button onClick={(e) => { e.stopPropagation(); goPrev() }} style={iconBtnStyle('left')} aria-label="Föregående">
+          <IconButton
+            onClick={(e) => { e.stopPropagation(); goPrev() }}
+            style={iconBtnStyle('left')}
+            label="Föregående"
+            size={44}
+            variant="dark"
+            round
+          >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
               <polyline points="15 18 9 12 15 6" />
             </svg>
-          </button>
-          <button onClick={(e) => { e.stopPropagation(); goNext() }} style={iconBtnStyle('right')} aria-label="Nästa">
+          </IconButton>
+          <IconButton
+            onClick={(e) => { e.stopPropagation(); goNext() }}
+            style={iconBtnStyle('right')}
+            label="Nästa"
+            size={44}
+            variant="dark"
+            round
+          >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
               <polyline points="9 18 15 12 9 6" />
             </svg>
-          </button>
+          </IconButton>
         </>
       )}
 
@@ -511,13 +532,6 @@ function Lightbox({ group, photoIndex, userData, onClose, onChange, onDeleted })
 function iconBtnStyle(position) {
   const base = {
     position: 'fixed',
-    background: 'rgba(0,0,0,0.4)',
-    color: DS.bone,
-    border: '1px solid rgba(244,243,241,0.25)',
-    width: 44, height: 44,
-    borderRadius: '50%',
-    display: 'flex', alignItems: 'center', justifyContent: 'center',
-    cursor: 'pointer',
     zIndex: 1001,
     backdropFilter: 'blur(6px)',
   }

@@ -13,6 +13,7 @@ import { DS, LORA, SYS } from '../styles/tokens.js'
 import {
   Avatar,
   CoverPlaceholder,
+  IconButton,
   LoadingState,
   MutedLabel,
   PhasePill,
@@ -21,15 +22,6 @@ import {
 } from '../components/ui.jsx'
 
 const SLIDE_UP_KEYFRAMES = `@keyframes bookDetailSlideUp { from { transform: translateY(28px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }`
-
-const heroIconBtn = {
-  background: 'rgba(255,255,255,0.6)',
-  border: 'none', cursor: 'pointer',
-  borderRadius: 10, width: 32, height: 32,
-  display: 'flex', alignItems: 'center', justifyContent: 'center',
-  outline: '1px solid rgba(156,153,143,0.2)',
-  transition: 'background 0.15s',
-}
 
 export default function BookDetails() {
   const { bookId } = useParams()
@@ -68,18 +60,18 @@ export default function BookDetails() {
         <div style={{ padding: '14px 18px 24px', position: 'relative' }}>
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
-            <button onClick={() => navigate(-1)} style={heroIconBtn} title="Tillbaka">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={DS.soft} strokeWidth="2.5" strokeLinecap="round">
+            <IconButton onClick={() => navigate(-1)} label="Tillbaka">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                 <polyline points="15 18 9 12 15 6" />
               </svg>
-            </button>
+            </IconButton>
             {userData?.role === 'admin' && (
-              <button onClick={() => navigate(`/books/${book.id}/edit`)} style={heroIconBtn} title="Redigera">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={DS.soft} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <IconButton onClick={() => navigate(`/books/${book.id}/edit`)} label="Redigera">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 20h9" />
                   <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
                 </svg>
-              </button>
+              </IconButton>
             )}
           </div>
 

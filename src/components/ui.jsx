@@ -209,6 +209,59 @@ export function PrimaryBtn({ children, onClick, small, type = 'button' }) {
   )
 }
 
+export function IconButton({
+  children,
+  label,
+  onClick,
+  title,
+  type = 'button',
+  size = 32,
+  variant = 'light',
+  round = false,
+  style,
+}) {
+  const [hov, setHov] = useState(false)
+  const [act, setAct] = useState(false)
+  const isDark = variant === 'dark'
+  const baseTransform = style?.transform
+  const activeTransform = act ? 'scale(0.95)' : ''
+  const transform = [baseTransform, activeTransform].filter(Boolean).join(' ') || 'none'
+
+  return (
+    <button
+      type={type}
+      onClick={onClick}
+      aria-label={label || title}
+      title={title || label}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => { setHov(false); setAct(false) }}
+      onMouseDown={() => setAct(true)}
+      onMouseUp={() => setAct(false)}
+      style={{
+        ...style,
+        width: size,
+        height: size,
+        borderRadius: round ? '50%' : 10,
+        border: isDark ? '1px solid rgba(244,243,241,0.25)' : 'none',
+        background: isDark
+          ? (hov ? 'rgba(0,0,0,0.55)' : 'rgba(0,0,0,0.4)')
+          : (hov ? 'rgba(255,255,255,0.78)' : 'rgba(255,255,255,0.6)'),
+        color: isDark ? DS.bone : DS.soft,
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        outline: isDark ? 'none' : '1px solid rgba(156,153,143,0.2)',
+        boxShadow: isDark ? 'none' : DS.shadowInset,
+        transition: 'background 0.15s ease, transform 0.12s ease',
+        transform,
+      }}
+    >
+      {children}
+    </button>
+  )
+}
+
 export function LoadingState({ text = 'Laddar...' }) {
   return (
     <div style={{ minHeight: '100vh', background: DS.gradientBg, padding: 24, color: DS.soft }}>
