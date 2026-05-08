@@ -55,7 +55,7 @@ function NoRoundView({ isAdmin, memberName }) {
   const [showForm, setShowForm] = useState(false)
 
   return (
-    <div style={{ minHeight: '100vh', background: DS.gradientBg, color: DS.ink }}>
+    <div style={{ minHeight: '100%', background: DS.gradientBg, color: DS.ink }}>
       <div style={{ maxWidth: 760, margin: '0 auto', padding: '18px 18px 24px' }}>
         <PageHeader title="Planering" />
         {isAdmin ? (
@@ -182,7 +182,7 @@ function LockedView({ round, isAdmin }) {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: DS.gradientBg, color: DS.ink }}>
+    <div style={{ minHeight: '100%', background: DS.gradientBg, color: DS.ink }}>
       <div style={{ maxWidth: 760, margin: '0 auto', padding: '18px 18px 24px' }}>
         <PageHeader title="Planering" />
         <div style={{
@@ -236,7 +236,7 @@ function ActiveView({ round, memberName, isAdmin }) {
   const pastSummary   = summary.filter(s => s.date < today)
 
   return (
-    <div style={{ minHeight: '100vh', background: DS.gradientBg, color: DS.ink }}>
+    <div style={{ minHeight: '100%', background: DS.gradientBg, color: DS.ink }}>
       <div style={{ maxWidth: 760, margin: '0 auto', display: 'flex', flexDirection: 'column' }}>
         <div style={{ padding: '18px 18px 0' }}>
           <PageHeader title="Planering" subtitle={round.title} />

@@ -1,4 +1,4 @@
-import { collection, addDoc, deleteDoc, doc, onSnapshot, orderBy, query, updateDoc, increment } from 'firebase/firestore'
+import { collection, addDoc, deleteDoc, doc, onSnapshot, orderBy, query, updateDoc, increment, writeBatch, serverTimestamp } from 'firebase/firestore'
 import { db } from './config.js'
 
 const suggestionsCol = collection(db, 'suggestions')
@@ -33,9 +33,9 @@ export function subscribeToComments(suggestionId, callback) {
 }
 
 export async function addComment(suggestionId, { text, authorName }) {
-  await addDoc(
-    collection(db, 'suggestions', suggestionId, 'comments'),
-    { text, authorName, createdAt: new Date().toISOString() }
-  )
-  await updateDoc(doc(db, 'suggestions', suggestionId), { commentCount: increment(1) })
+  const batch = writeBatch(db)
+  const commentRef = doc(collection(db, 'suggestions', suggestionId, 'comments'))
+  batch.set(commentRef, { text, authorName, createdAt: serverTimestamp() })
+  batch.update(doc(db, 'suggestions', suggestionId), { commentCount: increment(1) })
+  await batch.commit()
 }

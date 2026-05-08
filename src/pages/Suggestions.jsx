@@ -23,7 +23,7 @@ export default function Suggestions() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: DS.gradientBg, color: DS.ink }}>
+    <div style={{ minHeight: '100%', background: DS.gradientBg, color: DS.ink }}>
       <div style={{ maxWidth: 760, margin: '0 auto', padding: '18px 16px 100px' }}>
 
         <div style={{ marginBottom: 20 }}>
@@ -110,15 +110,25 @@ const SuggestionCard = memo(function SuggestionCard({ suggestion, memberName, is
     const text = replyText.trim()
     if (!text || sending || !memberName) return
     setSending(true)
-    await addComment(suggestion.id, { text, authorName: memberName })
-    setReplyText('')
-    setSending(false)
+    try {
+      await addComment(suggestion.id, { text, authorName: memberName })
+      setReplyText('')
+    } catch (err) {
+      console.error('handleReply failed:', err)
+    } finally {
+      setSending(false)
+    }
   }
 
   async function handleDelete(e) {
     e.stopPropagation()
     setDeleting(true)
-    await deleteSuggestion(suggestion.id)
+    try {
+      await deleteSuggestion(suggestion.id)
+    } catch (err) {
+      console.error('handleDelete failed:', err)
+      setDeleting(false)
+    }
   }
 
   function handleEdit(e) {
@@ -394,9 +404,13 @@ const SuggestionCard = memo(function SuggestionCard({ suggestion, memberName, is
 // ─── FAB ──────────────────────────────────────────────────────────────────────
 
 function AddFab({ onClick }) {
+  const [active, setActive] = useState(false)
   return (
     <button
       onClick={onClick}
+      onPointerDown={() => setActive(true)}
+      onPointerUp={() => setActive(false)}
+      onPointerCancel={() => setActive(false)}
       style={{
         position: 'fixed',
         bottom: 78, right: 18,
@@ -409,10 +423,11 @@ function AddFab({ onClick }) {
         fontSize: '1.65rem', color: DS.ink,
         transition: 'transform 0.15s',
         lineHeight: 1,
+        transform: active ? 'scale(0.92)' : 'none',
+        touchAction: 'manipulation',
+        WebkitTapHighlightColor: 'transparent',
+        userSelect: 'none',
       }}
-      onMouseDown={e => { e.currentTarget.style.transform = 'scale(0.92)' }}
-      onMouseUp={e => { e.currentTarget.style.transform = 'none' }}
-      onMouseLeave={e => { e.currentTarget.style.transform = 'none' }}
     >
       +
     </button>
@@ -434,26 +449,31 @@ function SuggestionForm({ memberName, initial, onClose }) {
     e.preventDefault()
     if (!title.trim() || !author.trim()) return
     setSaving(true)
-    if (isEdit) {
-      await updateSuggestion(initial.id, {
-        title: title.trim(),
-        author: author.trim(),
-        coverUrl: coverUrl.trim() || null,
-        comment: comment.trim() || null,
-        description: description.trim() || null,
-      })
-    } else {
-      await addSuggestion({
-        title: title.trim(),
-        author: author.trim(),
-        coverUrl: coverUrl.trim() || null,
-        comment: comment.trim() || null,
-        description: description.trim() || null,
-        suggestedBy: memberName,
-      })
+    try {
+      if (isEdit) {
+        await updateSuggestion(initial.id, {
+          title: title.trim(),
+          author: author.trim(),
+          coverUrl: coverUrl.trim() || null,
+          comment: comment.trim() || null,
+          description: description.trim() || null,
+        })
+      } else {
+        await addSuggestion({
+          title: title.trim(),
+          author: author.trim(),
+          coverUrl: coverUrl.trim() || null,
+          comment: comment.trim() || null,
+          description: description.trim() || null,
+          suggestedBy: memberName,
+        })
+      }
+      onClose()
+    } catch (err) {
+      console.error('handleSubmit failed:', err)
+    } finally {
+      setSaving(false)
     }
-    setSaving(false)
-    onClose()
   }
 
   return (

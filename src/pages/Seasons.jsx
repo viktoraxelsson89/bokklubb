@@ -26,7 +26,7 @@ export default function Seasons() {
   const seasons = getAllSeasons(finalizedBooks)
 
   return (
-    <div style={{ minHeight: '100vh', background: DS.gradientBg, color: DS.ink }}>
+    <div style={{ minHeight: '100%', background: DS.gradientBg, color: DS.ink }}>
       <div style={{ maxWidth: 760, margin: '0 auto' }}>
         <div style={{ padding: '18px 18px 14px' }}>
           <div style={{ fontFamily: LORA, fontWeight: 600, fontSize: '1.05rem', color: DS.ink, marginBottom: 2 }}>

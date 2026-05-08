@@ -42,7 +42,7 @@ export default function BookDetails() {
   const book = books.find(b => b.id === bookId)
   if (!book) {
     return (
-      <div style={{ minHeight: '100vh', background: DS.gradientBg, padding: 24, color: DS.soft }}>
+      <div style={{ minHeight: '100%', background: DS.gradientBg, padding: 24, color: DS.soft }}>
         Boken hittades inte.
       </div>
     )
@@ -54,7 +54,7 @@ export default function BookDetails() {
 
   return (
     <div style={{
-      minHeight: '100vh',
+      minHeight: '100%',
       background: DS.gradientBg,
       color: DS.ink,
       animation: 'bookDetailSlideUp 0.22s ease',

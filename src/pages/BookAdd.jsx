@@ -58,7 +58,7 @@ export default function BookAdd() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: DS.gradientBg, color: DS.ink }}>
+    <div style={{ minHeight: '100%', background: DS.gradientBg, color: DS.ink }}>
       <div style={{ maxWidth: 760, margin: '0 auto', padding: '18px 14px 32px' }}>
 
         <PageHeader title="Ny bok" onBack={() => navigate(-1)} />

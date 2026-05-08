@@ -70,7 +70,7 @@ export default function BookEdit() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: DS.gradientBg, color: DS.ink }}>
+    <div style={{ minHeight: '100%', background: DS.gradientBg, color: DS.ink }}>
       <div style={{ maxWidth: 760, margin: '0 auto', padding: '18px 14px 32px' }}>
 
         <PageHeader title="Redigera bok" onBack={returnToBook} />
@@ -134,7 +134,7 @@ export default function BookEdit() {
 
 function PageShell({ children }) {
   return (
-    <div style={{ minHeight: '100vh', background: DS.gradientBg, padding: 24, color: DS.soft }}>
+    <div style={{ minHeight: '100%', background: DS.gradientBg, padding: 24, color: DS.soft }}>
       {children}
     </div>
   )

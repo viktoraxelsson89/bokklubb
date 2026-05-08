@@ -51,7 +51,7 @@ export default function RecipeDetails() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: DS.gradientBg, color: DS.ink }}>
+    <div style={{ minHeight: '100%', background: DS.gradientBg, color: DS.ink }}>
       <div style={{ maxWidth: 760, margin: '0 auto' }}>
 
         {recipe.imageUrl ? (
@@ -197,7 +197,7 @@ function Section({ title, children }) {
 
 function Shell({ children }) {
   return (
-    <div style={{ minHeight: '100vh', background: DS.gradientBg, padding: 24, color: DS.soft }}>
+    <div style={{ minHeight: '100%', background: DS.gradientBg, padding: 24, color: DS.soft }}>
       {children}
     </div>
   )

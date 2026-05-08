@@ -24,7 +24,7 @@ export default function AuthenticatedLayout() {
                 <div style={{
                   display: 'flex',
                   flexDirection: 'column',
-                  height: 'var(--app-height, 100dvh)',
+                  height: 'var(--app-height, 100%)',
                   overflow: 'hidden',
                   background: DS.darkBg,
                 }}>

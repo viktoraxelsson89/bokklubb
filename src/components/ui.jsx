@@ -329,7 +329,7 @@ export function PageHeader({ title, subtitle, onBack, backLabel = 'Tillbaka', ac
 
 export function LoadingState({ text = 'Laddar...' }) {
   return (
-    <div style={{ minHeight: '100vh', background: DS.gradientBg, padding: 24, color: DS.soft }}>
+    <div style={{ minHeight: '100%', background: DS.gradientBg, padding: 24, color: DS.soft }}>
       {text}
     </div>
   )

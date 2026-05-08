@@ -3,7 +3,7 @@ import { DS } from '../styles/tokens.js'
 export default function Placeholder({ title }) {
   return (
     <div style={{
-      minHeight: '100vh',
+      minHeight: '100%',
       background: DS.gradientBg,
       display: 'flex', flexDirection: 'column',
       alignItems: 'center', justifyContent: 'center',
