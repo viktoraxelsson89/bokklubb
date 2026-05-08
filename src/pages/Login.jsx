@@ -34,14 +34,14 @@ export default function Login() {
 
   return (
     <div style={{
-      minHeight: '100%',
+      minHeight: '100vh',
       background: DS.gradientBg,
       fontFamily: SYS,
       color: DS.ink,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '24px 16px',
+      padding: 'calc(env(safe-area-inset-top) + 24px) 16px calc(env(safe-area-inset-bottom) + 24px)',
     }}>
       <div style={{ width: '100%', maxWidth: 380 }}>
         <div style={{

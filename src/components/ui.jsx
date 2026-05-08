@@ -411,11 +411,9 @@ export function BottomSheet({ children, footer, onClose, title, contentStyle }) 
   }, [])
 
   useEffect(() => {
-    const el = document.getElementById('main-scroll')
-    if (!el) return
-    const prev = el.style.overflow
-    el.style.overflow = 'hidden'
-    return () => { el.style.overflow = prev }
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = prev }
   }, [])
 
   function handleKeyDown(e) {

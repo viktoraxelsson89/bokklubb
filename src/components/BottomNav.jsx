@@ -54,9 +54,11 @@ export default function BottomNav() {
       <nav style={{
         background: DS.darkBg,
         display: 'flex',
-        flexShrink: 0,
+        position: 'fixed',
+        left: 0,
+        right: 0,
+        bottom: 0,
         paddingBottom: 'env(safe-area-inset-bottom)',
-        position: 'relative',
         zIndex: 92,
         touchAction: 'manipulation',
         WebkitTapHighlightColor: 'transparent',

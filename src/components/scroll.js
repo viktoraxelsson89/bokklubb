@@ -1,21 +1,22 @@
 import { useEffect } from 'react'
 
-function getMainScroll() {
-  if (typeof document === 'undefined') return null
-  return document.getElementById('main-scroll')
+function getScrollTop() {
+  if (typeof window === 'undefined') return 0
+  return window.scrollY || document.documentElement.scrollTop || 0
+}
+
+function scrollTo(top) {
+  if (typeof window === 'undefined') return
+  window.scrollTo({ top, left: 0, behavior: 'auto' })
 }
 
 export function saveMainScrollPosition(key) {
-  const el = getMainScroll()
-  if (!el) return
-  sessionStorage.setItem(key, String(el.scrollTop))
+  sessionStorage.setItem(key, String(getScrollTop()))
 }
 
 export function useMainScrollTop(trigger) {
   useEffect(() => {
-    const el = getMainScroll()
-    if (!el) return
-    el.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+    scrollTo(0)
   }, [trigger])
 }
 
@@ -31,7 +32,7 @@ export function useRestoreMainScroll(key, enabled) {
     if (!Number.isFinite(top)) return
 
     const frame = requestAnimationFrame(() => {
-      getMainScroll()?.scrollTo({ top, left: 0, behavior: 'auto' })
+      scrollTo(top)
     })
 
     return () => cancelAnimationFrame(frame)
