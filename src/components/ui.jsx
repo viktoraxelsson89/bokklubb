@@ -184,12 +184,14 @@ export function LogoBadge({ size = 36 }) {
   )
 }
 
-export function PrimaryBtn({ children, onClick, small, type = 'button' }) {
+export function PrimaryBtn({ children, onClick, small, type = 'button', disabled, style: extraStyle, form }) {
   const [hov, setHov] = useState(false)
   const [act, setAct] = useState(false)
   return (
     <button
       type={type}
+      form={form}
+      disabled={disabled}
       onClick={onClick}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => { setHov(false); setAct(false) }}
@@ -203,14 +205,16 @@ export function PrimaryBtn({ children, onClick, small, type = 'button' }) {
         minHeight: small ? 36 : 42,
         fontWeight: 600, fontFamily: 'inherit',
         fontSize: small ? '0.78rem' : '0.88rem',
-        border: 'none', cursor: 'pointer',
+        border: 'none', cursor: disabled ? 'default' : 'pointer',
         boxShadow: DS.shadowInset,
         transition: 'all 0.15s ease',
-        filter: hov ? 'brightness(1.05)' : 'none',
-        transform: act ? 'scale(0.95)' : 'none',
+        filter: hov && !disabled ? 'brightness(1.05)' : 'none',
+        transform: act && !disabled ? 'scale(0.95)' : 'none',
+        opacity: disabled ? 0.5 : 1,
         touchAction: 'manipulation',
         WebkitTapHighlightColor: 'transparent',
         userSelect: 'none',
+        ...extraStyle,
       }}
     >{children}</button>
   )
@@ -336,6 +340,7 @@ export function LoadingState({ text = 'Laddar...' }) {
 }
 
 export function EmptyState({ title, text, actionLabel, onAction, icon }) {
+  const [act, setAct] = useState(false)
   return (
     <div
       onClick={onAction}
@@ -350,13 +355,14 @@ export function EmptyState({ title, text, actionLabel, onAction, icon }) {
         cursor: onAction ? 'pointer' : 'default',
         outline: '1.5px dashed rgba(186,209,150,0.55)',
         transition: 'transform 0.15s',
+        transform: act ? 'scale(0.99)' : 'none',
         touchAction: onAction ? 'manipulation' : 'auto',
         WebkitTapHighlightColor: 'transparent',
       }}
-      onPointerDown={e => { if (onAction) e.currentTarget.style.transform = 'scale(0.99)' }}
-      onPointerUp={e => { e.currentTarget.style.transform = 'none' }}
-      onPointerCancel={e => { e.currentTarget.style.transform = 'none' }}
-      onPointerLeave={e => { e.currentTarget.style.transform = 'none' }}
+      onPointerDown={() => { if (onAction) setAct(true) }}
+      onPointerUp={() => setAct(false)}
+      onPointerCancel={() => setAct(false)}
+      onPointerLeave={() => setAct(false)}
     >
       {icon && (
         <div style={{

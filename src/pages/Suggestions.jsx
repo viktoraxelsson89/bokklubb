@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext.jsx'
 import { useSuggestions } from '../context/SuggestionsContext.jsx'
 import { addSuggestion, deleteSuggestion, updateSuggestion, subscribeToComments, addComment } from '../firebase/suggestions.js'
 import { coverHue, SUGGESTION_COMMENT_MAX, SUGGESTION_DESCRIPTION_MAX, SUGGESTION_REPLY_MAX } from '../domain/suggestions.js'
-import { Avatar, BottomSheet, EmptyState as UiEmptyState, LoadingState } from '../components/ui.jsx'
+import { Avatar, BottomSheet, EmptyState as UiEmptyState, LoadingState, PrimaryBtn } from '../components/ui.jsx'
 import { DS, LORA } from '../styles/tokens.js'
 
 export default function Suggestions() {
@@ -482,18 +482,23 @@ function SuggestionForm({ memberName, initial, onClose }) {
       title={isEdit ? 'Redigera tips' : 'Nytt boktips'}
       footer={
         <>
-          <button
+          <PrimaryBtn
             type="submit"
             form="suggestion-form"
             disabled={saving || !title.trim() || !author.trim()}
-            style={{
-              ...primaryBtnStyle,
-              opacity: (!title.trim() || !author.trim()) ? 0.5 : 1,
-            }}
           >
             {saving ? (isEdit ? 'Sparar\u2026' : 'L\u00e4gger till\u2026') : (isEdit ? 'Spara' : 'L\u00e4gg till')}
-          </button>
-          <button type="button" onClick={onClose} style={ghostBtnStyle}>
+          </PrimaryBtn>
+          <button type="button" onClick={onClose} style={{
+            padding: '9px 18px',
+            borderRadius: 12,
+            border: '1.5px solid rgba(156,153,143,0.35)',
+            background: 'transparent',
+            color: DS.soft,
+            fontFamily: 'inherit',
+            fontSize: '0.85rem',
+            cursor: 'pointer',
+          }}>
             Avbryt
           </button>
         </>
@@ -581,25 +586,3 @@ const inputStyle = {
   outline: 'none',
 }
 
-const primaryBtnStyle = {
-  padding: '10px 20px',
-  borderRadius: 12,
-  border: 'none',
-  background: DS.sage,
-  color: DS.ink,
-  fontFamily: 'inherit',
-  fontWeight: 600,
-  fontSize: '0.88rem',
-  cursor: 'pointer',
-}
-
-const ghostBtnStyle = {
-  padding: '9px 18px',
-  borderRadius: 12,
-  border: '1.5px solid rgba(156,153,143,0.35)',
-  background: 'transparent',
-  color: DS.soft,
-  fontFamily: 'inherit',
-  fontSize: '0.85rem',
-  cursor: 'pointer',
-}

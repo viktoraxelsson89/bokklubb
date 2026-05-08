@@ -11,7 +11,7 @@ export function subscribeToSuggestions(callback) {
 }
 
 export function addSuggestion(data) {
-  return addDoc(suggestionsCol, { ...data, addedAt: new Date().toISOString() })
+  return addDoc(suggestionsCol, { ...data, addedAt: serverTimestamp() })
 }
 
 export function updateSuggestion(id, data) {

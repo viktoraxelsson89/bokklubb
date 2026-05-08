@@ -23,5 +23,7 @@ export function SuggestionsProvider({ children }) {
 }
 
 export function useSuggestions() {
-  return useContext(SuggestionsContext)
+  const ctx = useContext(SuggestionsContext)
+  if (!ctx) throw new Error('useSuggestions must be used within SuggestionsProvider')
+  return ctx
 }
