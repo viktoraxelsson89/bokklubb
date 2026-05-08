@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { DS, LORA, SYS } from '../styles/tokens.js'
 import { MEMBERS } from '../domain/constants.js'
 
@@ -401,6 +401,15 @@ export function EmptyState({ title, text, actionLabel, onAction, icon }) {
 }
 
 export function BottomSheet({ children, footer, onClose, title, contentStyle }) {
+  const dialogRef = useRef(null)
+  const previousFocusRef = useRef(null)
+
+  useEffect(() => {
+    previousFocusRef.current = document.activeElement
+    dialogRef.current?.focus()
+    return () => { previousFocusRef.current?.focus() }
+  }, [])
+
   useEffect(() => {
     const el = document.getElementById('main-scroll')
     if (!el) return
@@ -409,13 +418,23 @@ export function BottomSheet({ children, footer, onClose, title, contentStyle }) 
     return () => { el.style.overflow = prev }
   }, [])
 
-  useEffect(() => {
-    function handleKeyDown(e) {
-      if (e.key === 'Escape') onClose?.()
+  function handleKeyDown(e) {
+    if (e.key === 'Escape') { onClose?.(); return }
+    if (e.key !== 'Tab') return
+    const focusable = dialogRef.current.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    )
+    if (!focusable.length) return
+    const first = focusable[0]
+    const last = focusable[focusable.length - 1]
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault()
+      last.focus()
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault()
+      first.focus()
     }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [onClose])
+  }
 
   return (
     <>
@@ -429,6 +448,9 @@ export function BottomSheet({ children, footer, onClose, title, contentStyle }) 
         }}
       />
       <section
+        ref={dialogRef}
+        tabIndex={-1}
+        onKeyDown={handleKeyDown}
         role="dialog"
         aria-modal="true"
         aria-label={title}

@@ -2,7 +2,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useSuggestions } from '../context/SuggestionsContext.jsx'
 import { addSuggestion, deleteSuggestion, updateSuggestion, subscribeToComments, addComment } from '../firebase/suggestions.js'
-import { coverHue, SUGGESTION_COMMENT_MAX, SUGGESTION_DESCRIPTION_MAX, SUGGESTION_REPLY_MAX } from '../domain/suggestions.js'
+import { coverHue, validateSuggestion, SUGGESTION_COMMENT_MAX, SUGGESTION_DESCRIPTION_MAX, SUGGESTION_REPLY_MAX } from '../domain/suggestions.js'
 import { Avatar, BottomSheet, EmptyState as UiEmptyState, LoadingState, PrimaryBtn } from '../components/ui.jsx'
 import { DS, LORA } from '../styles/tokens.js'
 
@@ -447,7 +447,8 @@ function SuggestionForm({ memberName, initial, onClose }) {
 
   async function handleSubmit(e) {
     e.preventDefault()
-    if (!title.trim() || !author.trim()) return
+    const err = validateSuggestion({ title, author })
+    if (err) return
     setSaving(true)
     try {
       if (isEdit) {
