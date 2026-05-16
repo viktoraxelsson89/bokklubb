@@ -17,6 +17,64 @@
 - I Codex-sandboxen kan `npm.cmd test`/`npm.cmd run build` falla på esbuild `spawn EPERM`; då räcker syntax/diff-check och lokal verifiering
 - Sammanfatta ändrade filer och beteendepåverkan efter varje uppgift
 
+## Byggprinciper (Karpathy)
+
+Beteenderegler för att minska vanliga LLM-kodfel. **Avvägning:** principerna favoriserar försiktighet före hastighet. För triviala uppgifter — använd omdöme.
+
+### 1. Tänk innan du kodar
+**Anta inget. Dölj inte förvirring. Lyft fram avvägningar.**
+
+Innan implementation:
+- Uttala antaganden explicit. Vid osäkerhet — fråga.
+- Vid flera tolkningar — presentera dem, välj inte tyst.
+- Om enklare approach finns — säg det. Pusha tillbaka när befogat.
+- Om något är oklart — stanna. Namnge det förvirrande. Fråga.
+
+### 2. Enkelhet först
+**Minsta kod som löser problemet. Inget spekulativt.**
+
+- Inga features utöver det som efterfrågats.
+- Inga abstraktioner för engångskod.
+- Ingen "flexibilitet" eller "konfigurerbarhet" som inte begärts.
+- Ingen felhantering för omöjliga scenarier.
+- Om du skrev 200 rader och det kunde varit 50 — skriv om.
+
+Fråga dig: "Skulle en senior ingenjör säga att det här är överkomplicerat?" Om ja — förenkla.
+
+### 3. Kirurgiska ändringar
+**Rör bara det du måste. Städa bara din egen röra.**
+
+Vid redigering av befintlig kod:
+- "Förbättra" inte angränsande kod, kommentarer eller formatering.
+- Refaktorera inte sådant som inte är trasigt.
+- Matcha befintlig stil, även om du själv gjort annorlunda.
+- Om du ser orelaterad död kod — nämn den, radera inte.
+
+När dina ändringar skapar orphans:
+- Ta bort imports/variabler/funktioner som DINA ändringar gjort oanvända.
+- Ta inte bort tidigare död kod om inte ombedd.
+
+Testet: Varje ändrad rad ska kunna spåras direkt till användarens begäran.
+
+### 4. Målstyrd exekvering
+**Definiera framgångskriterier. Loopa tills verifierat.**
+
+Förvandla uppgifter till verifierbara mål:
+- "Lägg till validering" → "Skriv tester för ogiltig input, få dem att passera"
+- "Fixa buggen" → "Skriv test som reproducerar den, få det att passera"
+- "Refaktorera X" → "Säkerställ att tester passerar före och efter"
+
+För flerstegsuppgifter — uttala kort plan:
+```
+1. [Steg] → verifiera: [check]
+2. [Steg] → verifiera: [check]
+3. [Steg] → verifiera: [check]
+```
+
+Starka framgångskriterier låter dig loopa självständigt. Svaga kriterier ("få det att funka") kräver ständig klargöring.
+
+**Principerna fungerar om:** färre onödiga ändringar i diffar, färre omskrivningar pga överkomplicering, klargörande frågor kommer före implementation istället för efter misstag.
+
 ## Stack (håll minimalt)
 - Vite + React + react-router-dom
 - Firebase (auth + firestore + storage)
